@@ -133,10 +133,12 @@ public class NetworkGUI {
         sinePanelRed = new SineWavePanel(410, 100);
         dataBoxBlue = new JTextPane();
         sinePanelBlue = new SineWavePanel(410, 100);
+
         MessageBubble bubbleR = new MessageBubble(dataBoxRed, sinePanelRed);
+        MessageBubble bubbleB = new MessageBubble(dataBoxBlue, sinePanelBlue);
 
 
-        graphicPanel = new GraphicPanel(bubbleR);
+        graphicPanel = new GraphicPanel(bubbleR, bubbleB);
         graphicPanel.setPreferredSize(new Dimension(1200, 600));
     }
 
@@ -146,7 +148,7 @@ public class NetworkGUI {
      */
     private void buildBottomPanel(){
         bottomPanel = new JPanel();
-        bottomPanel.setBorder(new EmptyBorder(10, 10, 50, 10));
+        bottomPanel.setBorder(new EmptyBorder(10, 10, 20, 10));
 
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);

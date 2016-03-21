@@ -30,8 +30,14 @@ public class GraphicPanel extends JPanel{
     private double bubbleX;
     private double bubbleY;
 
+    //Message bubble to act as ACK and its starting coordinates at R2
+    private MessageBubble bubbleACK;
+    private double bubbleACKX;
+    private double bubbleACKY;
+
     //Message bubble size
     private final int BUBBLE_SIZE = 40;
+    private final int BUBBLE_ACK_SIZE = 15;
 
     //Graph to hold nodes and edges
     private Graph graph;
@@ -122,9 +128,6 @@ public class GraphicPanel extends JPanel{
     private final int LAYER_WIDTH = 130;
     private final int LAYER_HEIGHT = 250;
 
-    //JTextPanel to show bubble info
-    private JTextPane bubbleDataPane;
-
     //Strings for layers host
     private final String PHY_HOST = "PHYSICAL_HOST";
     private final String DL_HOST = "DATALINK_HOST";
@@ -144,34 +147,47 @@ public class GraphicPanel extends JPanel{
     private final String APP_DEST = "APPLICATION_DEST";
 
     //Bounds for host and dest layers
-    Bounds[] hostLayerBounds;
-    Bounds[] destLayerBounds;
-    Bounds[] destLayerBounds2;
+    Bounds[] hostLayerBoundsRed;
+    Bounds[] destLayerBoundsRed;
 
+    Bounds[] hostLayerBoundsBlue;
+    Bounds[] destLayerBoundsBlue;
+
+    //Keep track of if animation is running.  False by default.
     private boolean isRunning = false;
 
     /**
      * Constructor.  Needs bubbles passed in because NetworkGUI has to create bubbles.
      * This is because NetworkGUI needs access to bubble data in order to dispaly in bubble data panel.
      */
-    public GraphicPanel(MessageBubble bRed){
-        //Set image coordinates ASSIGNMENT 1
-        //setImageCoordinates(STARTING_IMAGE_X, STARTING_IMAGE_Y);
+    public GraphicPanel(MessageBubble bRed, MessageBubble bBlue){
+        //Set image coordinates
+        setImageCoordinates();
 
-        //Set image coordinates ASSIGNMENT 2
-        setImageCoordinates2();
+        //Set image label coordinates
+        setImageLabelCoordinates();
 
         //Set image bounds
         setImageBounds();
 
         //Create red message bubble
-        //bubble = new MessageBubble(bubbleX, bubbleY, BUBBLE_SIZE, BUBBLE_SIZE, Color.red);
         bubbleRed = bRed;
         bubbleRed.setAttributes(bubbleX, bubbleY, BUBBLE_SIZE, BUBBLE_SIZE, Color.red);
 
+        //Create blue message bubble
+        bubbleBlue = bBlue;
+        bubbleBlue.setAttributes(bubbleX, bubbleY - BUBBLE_SIZE - 10, BUBBLE_SIZE, BUBBLE_SIZE, Color.blue);
+
+        //Create ACK bubble
+        bubbleACK = new MessageBubble(bubbleACKX, bubbleACKY, BUBBLE_ACK_SIZE, BUBBLE_ACK_SIZE, Color.green);
+        bubbleACK.setBubbleType("ACK");
+
         //Assign bounds to bubble
-        bubbleRed.setHostLayerBounds(hostLayerBounds);
-        bubbleRed.setDestLayerBounds(destLayerBounds);
+        bubbleRed.setHostLayerBounds(hostLayerBoundsRed);
+        bubbleRed.setDestLayerBounds(destLayerBoundsRed);
+
+        bubbleBlue.setHostLayerBounds(hostLayerBoundsBlue);
+        bubbleBlue.setDestLayerBounds(destLayerBoundsBlue);
 
         //Load host and router images, layer images
         try {
@@ -191,18 +207,13 @@ public class GraphicPanel extends JPanel{
             scaledR2 = routerImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
             scaledR3 = routerImage3.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
 
-
             layersImage1 = ImageIO.read(getClass().getResource("/resources/images/7_layer_network_1.png"));
             layersImage2 = ImageIO.read(getClass().getResource("/resources/images/7_layer_network_2.png"));
             layersImage3 = ImageIO.read(getClass().getResource("/resources/images/7_layer_network_3.png"));
 
-
             scaledL1 = layersImage1.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
             scaledL2 = layersImage2.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
             scaledL3 = layersImage3.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
-
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -226,6 +237,8 @@ public class GraphicPanel extends JPanel{
 
         //Add message bubble
         bubbleRed.draw(g2);
+        bubbleBlue.draw(g2);
+        bubbleACK.draw(g2);
 
         //Add desktop and router icons
         g2.drawImage(scaledH1,host1X, host1Y, null);
@@ -241,13 +254,15 @@ public class GraphicPanel extends JPanel{
         g2.drawImage(scaledL2, layer2X, layer2Y, null);
         g2.drawImage(scaledL3, layer3X, layer3Y, null);
 
-
         //Add String labels to desktop and router icons
         g2.setColor(Color.black);
         g2.drawString(host1Label, host1LabelX, host1LabelY);
         g2.drawString(host2Label, host2LabelX, host2LabelY);
+        g2.drawString(host3Label, host3LabelX, host3LabelY);
         g2.drawString(router1Label, router1LabelX, router1LabelY);
         g2.drawString(router2Label, router2LabelX, router2LabelY);
+        g2.drawString(router3Label, router3LabelX, router3LabelY);
+
 
         //Draw lines in between images
         // i.e. H1 - R1 - R2 - H2
@@ -262,56 +277,6 @@ public class GraphicPanel extends JPanel{
         g2.draw(new Line2D.Double(router1X + (IMAGE_WIDTH/2), router1Y + (IMAGE_HEIGHT/2), router3X + (IMAGE_WIDTH/2), router3Y+IMAGE_HEIGHT));
         g2.draw(new Line2D.Double(router3X + IMAGE_WIDTH, router3Y + (IMAGE_HEIGHT/2), host3X, host3Y + (IMAGE_HEIGHT/2)));
         g2.draw(new Line2D.Double(host3X + (IMAGE_WIDTH/2), host3Y, layer3X + (LAYER_WIDTH/2), layer3Y + LAYER_HEIGHT));
-
-
-
-
-    }
-
-    /**
-     * Set image coordinates based on starting image coordinates.
-     * Make each image equal distance apart.
-     *
-     * Set image label coordinates.
-     *
-     * @int x and int y -> starting coordinates for image all the way to the left.
-     */
-    private void setImageCoordinates(int x, int y){
-        int xDifference = 250;
-        int labelDifference = 50; //Center label over image
-        int layerDifference = 45;
-
-        //Initial image coords (host 1)
-        host1X = x;
-        host1Y = y;
-
-        //Other image coords in relation to first image
-        router1X = host1X + xDifference;
-        router2X = router1X + xDifference;
-        host2X = router2X + xDifference;
-        layer1X = host1X - layerDifference;
-        layer2X = host2X - layerDifference;
-
-        router1Y = host1Y;
-        router2Y = host1Y;
-        host2Y = host1Y;
-        layer1Y = host1Y - (LAYER_HEIGHT + 40);
-        layer2Y = host2Y - (LAYER_HEIGHT + 40);
-
-        //Image label coords
-        host1LabelX = host1X + labelDifference;
-        router1LabelX = host1LabelX + xDifference;
-        router2LabelX = router1LabelX + xDifference;
-        host2LabelX = router2LabelX + xDifference;
-
-        host1LabelY = host1Y;
-        router1LabelY = host1Y;
-        router2LabelY = host2Y;
-        host2LabelY = host1Y;
-
-        //Set starting bubble coordinates
-        bubbleX = layer1X + (LAYER_WIDTH / 2) - (BUBBLE_SIZE/2);
-        bubbleY = layer1Y;
     }
 
     /**
@@ -319,7 +284,7 @@ public class GraphicPanel extends JPanel{
      * This includes a 3rd 7-layers and a 3 host and router
      * All image coordinates are just going to be hard-coded unlike in first assignment
      */
-    private void setImageCoordinates2(){
+    private void setImageCoordinates(){
         int layerCenter = LAYER_WIDTH/2 - IMAGE_WIDTH/2;
         int layerHostGap = 30;
         int routerXDiff = 150;
@@ -352,12 +317,41 @@ public class GraphicPanel extends JPanel{
         router2X = host2X - routerXDiff;
         router2Y = host2Y;
 
-        router3X = host3X - routerXDiff ;
+        router3X = host3X - routerXDiff - 40 ;
         router3Y = host3Y;
 
         //Set bubble starting coordinates
         bubbleX = layer1X + (LAYER_WIDTH / 2) - (BUBBLE_SIZE/2);
         bubbleY = layer1Y;
+
+        //Set ACK bubble coordinates starting at R2
+        bubbleACKX = router2X;
+        bubbleACKY = router2Y + IMAGE_HEIGHT/2;
+    }
+
+    /**
+     * Set the coordiantes for images labels.
+     * Each label coordinate position will be based off of corresponding image location.
+     */
+    private void setImageLabelCoordinates(){
+        //Set labels in top right corner of images
+        host1LabelX = host1X + IMAGE_WIDTH;
+        host1LabelY = host1Y;
+
+        host2LabelX = host2X + IMAGE_WIDTH;
+        host2LabelY = host2Y;
+
+        host3LabelX = host3X + IMAGE_WIDTH;
+        host3LabelY = host3Y;
+
+        router1LabelX = router1X + IMAGE_WIDTH;
+        router1LabelY = router1Y;
+
+        router2LabelX = router2X + IMAGE_WIDTH;
+        router2LabelY = router2Y;
+
+        router3LabelX = router3X + IMAGE_WIDTH;
+        router3LabelY = router3Y;
     }
 
     /**
@@ -369,10 +363,15 @@ public class GraphicPanel extends JPanel{
      * For assignment 1 just need bounds for two layers.
      */
     private void setImageBounds(){
+        //Current positions within the layer
+        //Starts off at layer starting coordinate
         double currentY1 = layer1Y;
         double currentY2 = layer2Y;
+        double currentY3 = layer3Y;
+
         double layerSize = LAYER_HEIGHT / 7;
 
+        //Host layers for Red and Blue bubbles
         Bounds app1 = new Bounds(layer1X, layer1X + LAYER_WIDTH,currentY1, currentY1 + layerSize, APP_HOST);
         currentY1 += layerSize;
 
@@ -393,7 +392,7 @@ public class GraphicPanel extends JPanel{
 
         Bounds phy1 = new Bounds(layer1X, layer1X + LAYER_WIDTH,currentY1, currentY1 + layerSize, PHY_HOST);
 
-        //DEST LAYERS
+        //Dest layers for red
         Bounds app2 = new Bounds(layer2X, layer2X + LAYER_WIDTH,currentY2, currentY2 + layerSize, APP_DEST);
         currentY2 += layerSize;
 
@@ -414,9 +413,34 @@ public class GraphicPanel extends JPanel{
 
         Bounds phy2 = new Bounds(layer2X, layer2X + LAYER_WIDTH,currentY2, currentY2 + layerSize, PHY_DEST);
 
+        //Dest layers for blue
+        Bounds app3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, APP_DEST);
+        currentY3 += layerSize;
+
+        Bounds pres3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, PRES_DEST);
+        currentY3 += layerSize;
+
+        Bounds sess3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, SESS_DEST);
+        currentY3 += layerSize;
+
+        Bounds trans3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, TRANS_DEST);
+        currentY3 += layerSize;
+
+        Bounds net3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, NET_DEST);
+        currentY3 += layerSize;
+
+        Bounds dat3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, DL_DEST);
+        currentY3 += layerSize;
+
+        Bounds phy3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, PHY_DEST);
+
         //Add bounds in order of being visited.
-        hostLayerBounds = new Bounds[]{app1, pres1, sess1, trans1, net1, dat1, phy1};
-        destLayerBounds = new Bounds[]{phy2, dat2, net2, trans2, sess2, pres2, app2};
+        hostLayerBoundsRed = new Bounds[]{app1, pres1, sess1, trans1, net1, dat1, phy1};
+        destLayerBoundsRed = new Bounds[]{phy2, dat2, net2, trans2, sess2, pres2, app2};
+
+        //Add second destination bounds for blue bubble.
+        hostLayerBoundsBlue = hostLayerBoundsRed;
+        destLayerBoundsBlue = new Bounds[]{phy3, dat3, net3, trans3, sess3, pres3, app3};
     }
 
     /**
@@ -424,34 +448,90 @@ public class GraphicPanel extends JPanel{
      */
    // @Override
     public void run() {
-        ArrayList<Node> path = graph.getPath();
-        bubbleRed.setTarget(path.get(0));
+        //Get pre-determined paths for the red and blue message bubbles
+        ArrayList<Node> pathRed = graph.getPathRed();
+        ArrayList<Node> pathBlue = graph.getPathBlue();
+        ArrayList<Node> pathACK = graph.getPathACK();
+
+        //Set the first target nodes for the message bubbles
+        bubbleRed.setTarget(pathRed.get(0));
+        bubbleBlue.setTarget(pathBlue.get(0));
+        bubbleACK.setTarget(pathACK.get(0));
+
+        //Create a timer for animation
         Timer timer = new Timer(30, null);
+
+        //Animation is currently running
         isRunning = true;
 
-            ActionListener listener = new ActionListener() {
-                //Current place in path
-                int i = 0;
+        ActionListener listener = new ActionListener() {
+            //Current place in path
+            int redPos = 0;
+            int bluePos = 0;
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if(isRunning) {
+            //Booleans to keep track of if red and blue bubbles are done moving
+            boolean redMoving = true;
+            boolean blueMoving = true;
+            boolean ackMoving = false;
+            //To know when ack has finished moving
+            boolean ackDone = false;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //If red or bubble still moving then don't stop timer
+                if(isRunning & (redMoving || blueMoving)) {
+                    //Move the red bubble
+                    if(redMoving) { //Not at next target yet
                         if (bubbleRed.move()) {
                             repaint();
-                        } else {
-                            if (i < path.size() - 1) {
-                                i++;
-                                bubbleRed.setTarget(path.get(i));
+                        }
+                        else { //At target, update next target in path
+                            if (redPos < pathRed.size() - 1) {
+                                redPos++;
+
+                                //At R2, now ACK needs to be sent
+                                if(redPos == 3 && !ackDone){
+                                    redMoving = false;
+                                    System.out.println("RED STOPPED");
+                                    ackMoving = true;
+                                }
+
+                                bubbleRed.setTarget(pathRed.get(redPos));
                             } else {
-                                timer.stop();
+                                redMoving = false;
                             }
                         }
-                    }else{
-                        timer.stop();
                     }
-                }
-            };
 
+                    //Move the ack bubble
+                    if(ackMoving){
+                        if(bubbleACK.move()){
+                            repaint();
+                        }
+                        else{ //ACK finished, let red continue moving
+                            ackMoving = false;
+                            ackDone = true;
+                            redMoving = true;
+                            System.out.println("RED MOVING AGAIN");
+                        }
+                    }
+
+                    //Move the blue bubble
+                    if (bubbleBlue.move()) {
+                        repaint();
+                    } else {
+                        if (bluePos < pathBlue.size() - 1) {
+                            bluePos++;
+                            bubbleBlue.setTarget(pathBlue.get(bluePos));
+                        } else {
+                            blueMoving = false;
+                        }
+                    }
+                }else{
+                    timer.stop();
+                }
+            }
+        };
             timer.addActionListener(listener);
             timer.start();
     }
@@ -461,26 +541,47 @@ public class GraphicPanel extends JPanel{
      * Add the nodes to the graph
      */
     private void createNodes(){
+        //Y-coordinate that centers bubble on image for H1, H2, R1 and R2 (all on same horizontal line)
         double imageY = host1Y + IMAGE_HEIGHT/2 - BUBBLE_SIZE/2;
+        double imageYACK = host1Y + IMAGE_HEIGHT/2 - BUBBLE_ACK_SIZE/2;
 
-        Node node0 = new Node(host1X, imageY, HOST);
-        Node node1 = new Node(router1X, imageY, ROUTER);
-        Node node2 = new Node(router2X, imageY, ROUTER);
-        Node node3 = new Node(host2X, imageY, HOST);
-        Node node4 = new Node(host2X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer2Y, LAYER);
+        //Y coordinate for H3 and R3
+        double imageY3 = host3Y + IMAGE_HEIGHT/2 - BUBBLE_SIZE/2;
 
-        graph.addNode(node0);
-        graph.addNode(node1);
-        graph.addNode(node2);
-        graph.addNode(node3);
-        graph.addNode(node4);
+        //Nodes, Layer1 not including since it is the starting point for both bubbles
+        Node nodeH1 = new Node(host1X, imageY, HOST);
+        Node nodeH2 = new Node(host2X, imageY, HOST);
+        Node nodeH3 = new Node(host3X, imageY3, HOST);
+
+        Node nodeR1 = new Node(router1X, imageY, ROUTER);
+        Node nodeR2 = new Node(router2X, imageY, ROUTER);
+        Node nodeR3 = new Node(router3X, imageY3, ROUTER);
+
+        Node nodeL2 = new Node(host2X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer2Y, LAYER);
+        Node nodeL3 = new Node(host3X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer3Y, LAYER);
+
+        Node nodeR1ACK = new Node(router1X, imageYACK, ROUTER);
+
+        graph.addNode(nodeH1);
+        graph.addNode(nodeH2);
+        graph.addNode(nodeH3);
+        graph.addNode(nodeR1);
+        graph.addNode(nodeR2);
+        graph.addNode(nodeR3);
+        graph.addNode(nodeL2);
+        graph.addNode(nodeL3);
+
+        //Secondary node for R1 for ACK -- size is different
+        graph.addNode(nodeR1ACK);
     }
 
     /*
      * Stop animation.
+     * For reset button in NetworkGUI
      */
     public void stop(){
         isRunning = false;
         bubbleRed.reset();
+        bubbleBlue.reset();
     }
 }

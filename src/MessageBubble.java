@@ -59,8 +59,8 @@ public class MessageBubble extends Ellipse2D{
     //Speed for the bubble to move
     private int speed = 1;
 
-    //Current node on the path
-    private Node currentNode;
+    //TYPE used for special ACK message bubble
+    private String type = "";
 
     //Current node in the array
     private int currentIndex = 0;
@@ -81,6 +81,11 @@ public class MessageBubble extends Ellipse2D{
     //sine panel
     SineWavePanel sinePanel;
 
+    //Message being set in the bubble
+    private String message;
+
+    //Current packet, changes in each layer
+    private String currentPacket;
 
     public MessageBubble(double x, double y, double w, double h, Color c){
         startX = x;
@@ -146,8 +151,11 @@ public class MessageBubble extends Ellipse2D{
             //Set new values to the bubble
             setFrame(currX, currY, width, height);
         }
-        //Update message bubble data based on coordinates
-        updateData();
+        //Update message bubble data based on coordinates IF not an ACK bubble
+        if(type != "ACK") {
+            updateData();
+        }
+
         return true;
     }
 
@@ -253,10 +261,10 @@ public class MessageBubble extends Ellipse2D{
                     bubblePane.setText(data);
                     currentLayer = 6;
                 }
-            }else if(currentLayer == 6){
+            }else if(currentLayer == 6){ //Data-link layer
                 if (currentBounds[5].isInBounds(currX, currY, width)) {
-                    data = "  H3" + "  H2" + "  H1" + "  A";
-                    bubblePane.setText(data);
+                    //data = "  H3" + "  H2" + "  H1" + "  A";
+                    bubblePane.setText(getDataLinkFrame(currentPacket));
                     currentLayer = 7;
                 }
             }else if(currentLayer == 7){
@@ -342,5 +350,43 @@ public class MessageBubble extends Ellipse2D{
         bubblePane.setText("");
         sinePanel.setVisible(false);
         sinePanel.setIsSine(false);
+    }
+
+    /**
+     * Set message to be transmitted in this message bubble.
+     */
+    public void setMessage(String msg){
+        message = msg;
+        currentPacket = message;
+    }
+
+    /**
+     * Get data-link frame from current packet.
+     * Add appropriate fields for a frame.
+     */
+    private String getDataLinkFrame(String packet){
+        String frame = "";
+
+        //Add preliminary
+        frame += "55555555555555";
+
+        //Add SFD
+        frame += "AB";
+
+        //Add dest address
+        frame += "";
+
+        //Add src address
+        //Add type
+        //Add data (packet)
+        //Add CRC-32
+        return frame;
+    }
+
+    /**
+     * Set type.  ACK message bubble will use this method to set type "ACK".
+     */
+    public void setBubbleType(String t){
+        type = t;
     }
 }
