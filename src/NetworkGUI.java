@@ -49,6 +49,7 @@ public class NetworkGUI {
 
     //Panel to hold the sine wave
     SineWavePanel sinePanelRed;
+    SineWavePanel sinePanelBlue;
 
     /**
      * Default constructor for the GUI.
@@ -130,6 +131,8 @@ public class NetworkGUI {
     private void buildGraphicPanel(){
         dataBoxRed = new JTextPane();
         sinePanelRed = new SineWavePanel(410, 100);
+        dataBoxBlue = new JTextPane();
+        sinePanelBlue = new SineWavePanel(410, 100);
         MessageBubble bubbleR = new MessageBubble(dataBoxRed, sinePanelRed);
 
 
@@ -145,28 +148,46 @@ public class NetworkGUI {
         bottomPanel = new JPanel();
         bottomPanel.setBorder(new EmptyBorder(10, 10, 50, 10));
 
-        //Set data box with larger size and give it a frame
-        dataBoxRed.setPreferredSize(new Dimension(400, 100));
-
-        Border border = BorderFactory.createLineBorder(Color.BLACK);
-        dataBoxRed.setBorder(border);
-        dataBoxRed.setEditable(false);
-        StyledDocument doc = dataBoxRed.getStyledDocument();
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
         StyleConstants.setBold(center, true);
         StyleConstants.setFontSize(center, 18);
-        doc.setParagraphAttributes(0, doc.getLength(), center, false);
 
-        //Set up and add sine panel
+        //Set red data box with larger size and give it a frame
+        dataBoxRed.setPreferredSize(new Dimension(400, 100));
+
+        Border borderRed = BorderFactory.createLineBorder(Color.RED);
+        dataBoxRed.setBorder(borderRed);
+        dataBoxRed.setEditable(false);
+        StyledDocument docRed = dataBoxRed.getStyledDocument();
+        docRed.setParagraphAttributes(0, docRed.getLength(), center, false);
+
+        //Set up and add sine panel red
         sinePanelRed.setPreferredSize(new Dimension(410, 100));
-        sinePanelRed.setBorder(border);
+        sinePanelRed.setBorder(borderRed);
         sinePanelRed.setIsSine(false);
         sinePanelRed.setVisible(false);
+
+        //Set blue data box with larger size and give it a frame
+        dataBoxBlue.setPreferredSize(new Dimension(400, 100));
+
+        Border borderBlue = BorderFactory.createLineBorder(Color.BLUE);
+        dataBoxBlue.setBorder(borderBlue);
+        dataBoxBlue.setEditable(false);
+        StyledDocument docBlue = dataBoxBlue.getStyledDocument();
+        docBlue.setParagraphAttributes(0, docBlue.getLength(), center, false);
+
+        //Set up and add sine panel blue
+        sinePanelBlue.setPreferredSize(new Dimension(410, 100));
+        sinePanelBlue.setBorder(borderBlue);
+        sinePanelBlue.setIsSine(false);
+        sinePanelBlue.setVisible(false);
 
         //Add data box to panel
         bottomPanel.add(dataBoxRed);
         bottomPanel.add(sinePanelRed);
+        bottomPanel.add(dataBoxBlue);
+        bottomPanel.add(sinePanelBlue);
     }
 
     /**
