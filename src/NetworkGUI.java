@@ -41,31 +41,14 @@ public class NetworkGUI {
     private JPanel bottomPanel;
 
     //Text frame to show bubble info
-    private JTextPane dataBox;
+    private JTextPane dataBoxRed;
+    private JTextPane dataBoxBlue;
 
     //Button for reset
     private JButton resetButton;
 
-
-    //String to hold data box info
-    private String bubbleData;
-
-    //Message bubble starting coordinates
-    private double bubbleX;
-    private double bubbleY;
-
-    //Message bubble size
-    private final int BUBBLE_SIZE = 40;
-
-    //Message bubble
-    MessageBubble bubble;
-
-    //File to write bubble data to
-    private final String FILE_NAME = "bubble_data.txt";
-    private Path filePath = Paths.get(FILE_NAME);
-
     //Panel to hold the sine wave
-    SineWavePanel sinePanel;
+    SineWavePanel sinePanelRed;
 
     /**
      * Default constructor for the GUI.
@@ -145,11 +128,12 @@ public class NetworkGUI {
      * Will show all animations.
      */
     private void buildGraphicPanel(){
-        dataBox = new JTextPane();
-        sinePanel = new SineWavePanel(410, 100);
-        bubble = new MessageBubble(dataBox, sinePanel);
+        dataBoxRed = new JTextPane();
+        sinePanelRed = new SineWavePanel(410, 100);
+        MessageBubble bubbleR = new MessageBubble(dataBoxRed, sinePanelRed);
 
-        graphicPanel = new GraphicPanel(bubble);
+
+        graphicPanel = new GraphicPanel(bubbleR);
         graphicPanel.setPreferredSize(new Dimension(1200, 600));
     }
 
@@ -162,12 +146,12 @@ public class NetworkGUI {
         bottomPanel.setBorder(new EmptyBorder(10, 10, 50, 10));
 
         //Set data box with larger size and give it a frame
-        dataBox.setPreferredSize(new Dimension(400, 100));
+        dataBoxRed.setPreferredSize(new Dimension(400, 100));
 
         Border border = BorderFactory.createLineBorder(Color.BLACK);
-        dataBox.setBorder(border);
-        dataBox.setEditable(false);
-        StyledDocument doc = dataBox.getStyledDocument();
+        dataBoxRed.setBorder(border);
+        dataBoxRed.setEditable(false);
+        StyledDocument doc = dataBoxRed.getStyledDocument();
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
         StyleConstants.setBold(center, true);
@@ -175,14 +159,14 @@ public class NetworkGUI {
         doc.setParagraphAttributes(0, doc.getLength(), center, false);
 
         //Set up and add sine panel
-        sinePanel.setPreferredSize(new Dimension(410, 100));
-        sinePanel.setBorder(border);
-        sinePanel.setIsSine(false);
-        sinePanel.setVisible(false);
+        sinePanelRed.setPreferredSize(new Dimension(410, 100));
+        sinePanelRed.setBorder(border);
+        sinePanelRed.setIsSine(false);
+        sinePanelRed.setVisible(false);
 
         //Add data box to panel
-        bottomPanel.add(dataBox);
-        bottomPanel.add(sinePanel);
+        bottomPanel.add(dataBoxRed);
+        bottomPanel.add(sinePanelRed);
     }
 
     /**

@@ -23,7 +23,8 @@ public class GraphicPanel extends JPanel{
     private final String LAYER = "LAYER";
 
     //Message bubble
-    private MessageBubble bubble;
+    private MessageBubble bubbleRed;
+    private MessageBubble bubbleBlue;
 
     //Message bubble starting coordinates
     private double bubbleX;
@@ -112,7 +113,7 @@ public class GraphicPanel extends JPanel{
     private final int STARTING_IMAGE_Y_2 = 140;
 
     //Starting image coordinates for layer 3 (layer in MIDDLE)
-    private final int STARTING_IMAGE_X_3 = 500;
+    private final int STARTING_IMAGE_X_3 = 550;
     private final int STARTING_IMAGE_Y_3 = 30;
 
     //Image sizes
@@ -149,7 +150,11 @@ public class GraphicPanel extends JPanel{
 
     private boolean isRunning = false;
 
-    public GraphicPanel(MessageBubble b){
+    /**
+     * Constructor.  Needs bubbles passed in because NetworkGUI has to create bubbles.
+     * This is because NetworkGUI needs access to bubble data in order to dispaly in bubble data panel.
+     */
+    public GraphicPanel(MessageBubble bRed){
         //Set image coordinates ASSIGNMENT 1
         //setImageCoordinates(STARTING_IMAGE_X, STARTING_IMAGE_Y);
 
@@ -161,12 +166,12 @@ public class GraphicPanel extends JPanel{
 
         //Create red message bubble
         //bubble = new MessageBubble(bubbleX, bubbleY, BUBBLE_SIZE, BUBBLE_SIZE, Color.red);
-        bubble = b;
-        bubble.setAttributes(bubbleX, bubbleY, BUBBLE_SIZE, BUBBLE_SIZE, Color.red);
+        bubbleRed = bRed;
+        bubbleRed.setAttributes(bubbleX, bubbleY, BUBBLE_SIZE, BUBBLE_SIZE, Color.red);
 
         //Assign bounds to bubble
-        bubble.setHostLayerBounds(hostLayerBounds);
-        bubble.setDestLayerBounds(destLayerBounds);
+        bubbleRed.setHostLayerBounds(hostLayerBounds);
+        bubbleRed.setDestLayerBounds(destLayerBounds);
 
         //Load host and router images, layer images
         try {
@@ -220,7 +225,7 @@ public class GraphicPanel extends JPanel{
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
         //Add message bubble
-        bubble.draw(g2);
+        bubbleRed.draw(g2);
 
         //Add desktop and router icons
         g2.drawImage(scaledH1,host1X, host1Y, null);
@@ -248,11 +253,18 @@ public class GraphicPanel extends JPanel{
         // i.e. H1 - R1 - R2 - H2
         BasicStroke bold = new BasicStroke(2.0f);
         g2.setStroke(bold);
+
         g2.draw(new Line2D.Double(host1X+IMAGE_WIDTH, host1Y+(IMAGE_HEIGHT/2), router1X, router1Y+(IMAGE_HEIGHT/2)));
         g2.draw(new Line2D.Double(router1X+IMAGE_WIDTH, router1Y+(IMAGE_HEIGHT/2), router2X, router2Y+(IMAGE_HEIGHT/2)));
         g2.draw(new Line2D.Double(router2X+IMAGE_WIDTH, router2Y+(IMAGE_HEIGHT/2), host2X, host2Y+(IMAGE_HEIGHT/2)));
         g2.draw(new Line2D.Double(layer1X + (LAYER_WIDTH/2), layer1Y + LAYER_HEIGHT, layer1X + (LAYER_WIDTH/2), host1Y));
         g2.draw(new Line2D.Double(layer2X + (LAYER_WIDTH/2), layer2Y + LAYER_HEIGHT, layer2X + (LAYER_WIDTH/2), host2Y));
+        g2.draw(new Line2D.Double(router1X + (IMAGE_WIDTH/2), router1Y + (IMAGE_HEIGHT/2), router3X + (IMAGE_WIDTH/2), router3Y+IMAGE_HEIGHT));
+        g2.draw(new Line2D.Double(router3X + IMAGE_WIDTH, router3Y + (IMAGE_HEIGHT/2), host3X, host3Y + (IMAGE_HEIGHT/2)));
+        g2.draw(new Line2D.Double(host3X + (IMAGE_WIDTH/2), host3Y, layer3X + (LAYER_WIDTH/2), layer3Y + LAYER_HEIGHT));
+
+
+
 
     }
 
@@ -340,8 +352,12 @@ public class GraphicPanel extends JPanel{
         router2X = host2X - routerXDiff;
         router2Y = host2Y;
 
-        router3X = host3X - routerXDiff + 50;
+        router3X = host3X - routerXDiff ;
         router3Y = host3Y;
+
+        //Set bubble starting coordinates
+        bubbleX = layer1X + (LAYER_WIDTH / 2) - (BUBBLE_SIZE/2);
+        bubbleY = layer1Y;
     }
 
     /**
@@ -409,7 +425,7 @@ public class GraphicPanel extends JPanel{
    // @Override
     public void run() {
         ArrayList<Node> path = graph.getPath();
-        bubble.setTarget(path.get(0));
+        bubbleRed.setTarget(path.get(0));
         Timer timer = new Timer(30, null);
         isRunning = true;
 
@@ -420,12 +436,12 @@ public class GraphicPanel extends JPanel{
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if(isRunning) {
-                        if (bubble.move()) {
+                        if (bubbleRed.move()) {
                             repaint();
                         } else {
                             if (i < path.size() - 1) {
                                 i++;
-                                bubble.setTarget(path.get(i));
+                                bubbleRed.setTarget(path.get(i));
                             } else {
                                 timer.stop();
                             }
@@ -465,6 +481,6 @@ public class GraphicPanel extends JPanel{
      */
     public void stop(){
         isRunning = false;
-        bubble.reset();
+        bubbleRed.reset();
     }
 }
