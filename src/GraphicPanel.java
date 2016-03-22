@@ -17,6 +17,12 @@ public class GraphicPanel extends JPanel{
 
     Graphics2D g2;
 
+    boolean timerReady = false;
+    boolean resend = false;
+    boolean makeCopy = false;
+    boolean discarded = false;
+    int counter = 0;
+
     //Types of nodes
     private final String ROUTER = "ROUTER";
     private final String HOST = "HOST";
@@ -25,6 +31,7 @@ public class GraphicPanel extends JPanel{
     //Message bubble
     private MessageBubble bubbleRed;
     private MessageBubble bubbleBlue;
+    private MessageBubble bubbleRedCopy;
 
     //Message bubble starting coordinates
     private double bubbleX;
@@ -189,6 +196,9 @@ public class GraphicPanel extends JPanel{
         bubbleACK = new MessageBubble(bubbleACKX, bubbleACKY, BUBBLE_ACK_SIZE, BUBBLE_ACK_SIZE, Color.green);
         bubbleACK.setBubbleType("ACK");
 
+        //Create copy of red bubble for R1
+        bubbleRedCopy = new MessageBubble(router1X, router1Y, BUBBLE_SIZE, BUBBLE_SIZE, Color.red);
+
         //Assign bounds to bubble
         bubbleRed.setHostLayerBounds(hostLayerBoundsRed);
         bubbleRed.setDestLayerBounds(destLayerBoundsRed);
@@ -240,13 +250,20 @@ public class GraphicPanel extends JPanel{
     @Override
     public void paint(Graphics g) {
         super.paintComponent(g);
+
         g2 = (Graphics2D) g;
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
         //Add message bubble
-        bubbleRed.draw(g2);
+        if(makeCopy){
+            bubbleRedCopy.draw(g2);
+        }
+        if(!discarded) {
+            bubbleRed.draw(g2);
+        }
+
         bubbleBlue.draw(g2);
         bubbleACK.draw(g2);
 
@@ -264,7 +281,9 @@ public class GraphicPanel extends JPanel{
         g2.drawImage(scaledL2, layer2X, layer2Y, null);
         g2.drawImage(scaledL3, layer3X, layer3Y, null);
 
-        //g2.drawImage(timerImage, timerX, timerY ,null);
+        if(timerReady) {
+            g2.drawImage(timerImage, timerX, timerY, null);
+        }
 
         //Add String labels to desktop and router icons
         g2.setColor(Color.black);
@@ -274,7 +293,6 @@ public class GraphicPanel extends JPanel{
         g2.drawString(router1Label, router1LabelX, router1LabelY);
         g2.drawString(router2Label, router2LabelX, router2LabelY);
         g2.drawString(router3Label, router3LabelX, router3LabelY);
-
 
         //Draw lines in between images
         // i.e. H1 - R1 - R2 - H2
@@ -460,7 +478,7 @@ public class GraphicPanel extends JPanel{
     }
 
     /**
-     * Move the ball in a seperate thread.
+     * Move the ball.
      */
    // @Override
     public void run() {
@@ -497,7 +515,7 @@ public class GraphicPanel extends JPanel{
                 //If red or bubble still moving then don't stop timer
                 if(isRunning & (redMoving || blueMoving)) {
                     //Move the red bubble
-                    if(redMoving) { //Not at next target yet
+                    if(redMoving && !ackMoving) { //Not at next target yet
                         if (bubbleRed.move()) {
                             repaint();
                         }
@@ -505,10 +523,18 @@ public class GraphicPanel extends JPanel{
                             if (redPos < pathRed.size() - 1) {
                                 redPos++;
 
+                                //At R1, make a copy to leave there
+                                if(redPos == 2 && !ackDone && !resend){
+                                    makeCopy = true;
+                                    timerReady = true;
+                                    repaint();
+                                }
+
                                 //At R2, now ACK needs to be sent
-                                if(redPos == 3 && !ackDone){
-                                    redMoving = false;
+                                if(redPos == 3 && !ackDone && !resend){
+                                    //redMoving = false;
                                     ackMoving = true;
+                                    repaint();
                                 }
 
                                 bubbleRed.setTarget(pathRed.get(redPos));
@@ -518,8 +544,8 @@ public class GraphicPanel extends JPanel{
                         }
                     }
 
-                    //Move the ack bubble
-                    if(ackMoving){
+                    //Move the ack bubble if second time red bubble has been sent
+                    if(ackMoving && counter >= 100 && resend){
                         if(bubbleACK.move()){
                             repaint();
                         }
@@ -527,7 +553,22 @@ public class GraphicPanel extends JPanel{
                             ackMoving = false;
                             ackDone = true;
                             redMoving = true;
+                            timerReady = false;
+                            repaint();
                         }
+                    }else if(counter >=100 && !resend){
+                        discarded = true;
+                        bubbleRed = bubbleRedCopy;
+                        bubbleRed.setHostLayerBounds(hostLayerBoundsRed);
+                        bubbleRed.setDestLayerBounds(destLayerBoundsRed);
+                        redPos = 2;
+                        bubbleRedCopy.setTarget(pathRed.get(3));
+                        ackMoving = false;
+                        counter = 0;
+                        resend = true;
+                    }
+                    else if(ackMoving && counter < 100){
+                        counter ++;
                     }
 
                     //Move the blue bubble

@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
@@ -152,8 +153,12 @@ public class NetworkGUI {
 
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
-        StyleConstants.setBold(center, true);
-        StyleConstants.setFontSize(center, 12);
+
+        SimpleAttributeSet left = new SimpleAttributeSet();
+        StyleConstants.setAlignment(left, StyleConstants.ALIGN_LEFT);
+
+        StyleConstants.setBold(left, true);
+        StyleConstants.setFontSize(left, 8);
 
         //Set red data box with larger size and give it a frame
         dataBoxRed.setPreferredSize(new Dimension(400, 100));
@@ -162,7 +167,7 @@ public class NetworkGUI {
         dataBoxRed.setBorder(borderRed);
         dataBoxRed.setEditable(false);
         StyledDocument docRed = dataBoxRed.getStyledDocument();
-        docRed.setParagraphAttributes(0, docRed.getLength(), center, false);
+        docRed.setParagraphAttributes(0, docRed.getLength(), left, false);
 
         //Set up and add sine panel red
         sinePanelRed.setPreferredSize(new Dimension(410, 100));
@@ -177,7 +182,7 @@ public class NetworkGUI {
         dataBoxBlue.setBorder(borderBlue);
         dataBoxBlue.setEditable(false);
         StyledDocument docBlue = dataBoxBlue.getStyledDocument();
-        docBlue.setParagraphAttributes(0, docBlue.getLength(), center, false);
+        docBlue.setParagraphAttributes(0, docBlue.getLength(), left, false);
 
         //Set up and add sine panel blue
         sinePanelBlue.setPreferredSize(new Dimension(410, 100));
