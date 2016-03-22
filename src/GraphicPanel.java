@@ -55,6 +55,9 @@ public class GraphicPanel extends JPanel{
     private BufferedImage layersImage2;
     private BufferedImage layersImage3;
 
+    //Timer image for ACK
+    private BufferedImage timerImage;
+
     //Scaled images
     private Image scaledH1;
     private Image scaledH2;
@@ -65,6 +68,7 @@ public class GraphicPanel extends JPanel{
     private Image scaledL1;
     private Image scaledL2;
     private Image scaledL3;
+    private Image scaledTimer;
 
     //Icon String labels
     private String host1Label = "H1";
@@ -109,6 +113,9 @@ public class GraphicPanel extends JPanel{
     private int router2LabelY;
     private int router3LabelX;
     private int router3LabelY;
+
+    private int timerX;
+    private int timerY;
 
     //Starting image coordinates (coords for host 1)
     private final int STARTING_IMAGE_X_1 = 200;
@@ -214,6 +221,9 @@ public class GraphicPanel extends JPanel{
             scaledL1 = layersImage1.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
             scaledL2 = layersImage2.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
             scaledL3 = layersImage3.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
+
+            timerImage = ImageIO.read(getClass().getResource("/resources/images/timer_icon.png"));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -253,6 +263,8 @@ public class GraphicPanel extends JPanel{
         g2.drawImage(scaledL1, layer1X, layer1Y, null);
         g2.drawImage(scaledL2, layer2X, layer2Y, null);
         g2.drawImage(scaledL3, layer3X, layer3Y, null);
+
+        //g2.drawImage(timerImage, timerX, timerY ,null);
 
         //Add String labels to desktop and router icons
         g2.setColor(Color.black);
@@ -327,6 +339,10 @@ public class GraphicPanel extends JPanel{
         //Set ACK bubble coordinates starting at R2
         bubbleACKX = router2X;
         bubbleACKY = router2Y + IMAGE_HEIGHT/2;
+
+        //Set timer coordinates below R1
+        timerX = router1X + IMAGE_WIDTH;
+        timerY = router2Y + IMAGE_HEIGHT;
     }
 
     /**
@@ -492,7 +508,6 @@ public class GraphicPanel extends JPanel{
                                 //At R2, now ACK needs to be sent
                                 if(redPos == 3 && !ackDone){
                                     redMoving = false;
-                                    System.out.println("RED STOPPED");
                                     ackMoving = true;
                                 }
 
@@ -512,7 +527,6 @@ public class GraphicPanel extends JPanel{
                             ackMoving = false;
                             ackDone = true;
                             redMoving = true;
-                            System.out.println("RED MOVING AGAIN");
                         }
                     }
 

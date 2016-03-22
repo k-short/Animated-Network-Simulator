@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.zip.CRC32;
 
 /**
  * Created by ken12_000 on 1/26/2016.
@@ -86,6 +87,9 @@ public class MessageBubble extends Ellipse2D{
 
     //Current packet, changes in each layer
     private String currentPacket;
+
+    //Get CRC-32 value from data stream
+    private CRC32 crc;
 
     public MessageBubble(double x, double y, double w, double h, Color c){
         startX = x;
@@ -365,21 +369,26 @@ public class MessageBubble extends Ellipse2D{
      * Add appropriate fields for a frame.
      */
     private String getDataLinkFrame(String packet){
+        crc = new CRC32();
+
         String frame = "";
+        String preliminary = "AAAAAAAAAAAAAA";
+        String SFD = "AB";
+        String dest = "4A301021101A";
+        String src = "47201B2E08EE";
+        String type = "DBA0";
+        String data = "41000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
-        //Add preliminary
-        frame += "55555555555555";
+        //Get CRC
+        byte[] bytes = hexStringToByteArray(dest + src + type + data);
+        crc.update(bytes, 0, 60);
+        long CRC = crc.getValue();
+        Long CRC_LONG = new Long(0);
+        String crc32 = CRC_LONG.toHexString(CRC);
+        crc32 = crc32.toUpperCase();
 
-        //Add SFD
-        frame += "AB";
+        frame = preliminary + "\n" + SFD + "\n" + dest + "\n" + src + "\n" + type + "\n" + data + "\n" + crc32;
 
-        //Add dest address
-        frame += "";
-
-        //Add src address
-        //Add type
-        //Add data (packet)
-        //Add CRC-32
         return frame;
     }
 
@@ -388,5 +397,15 @@ public class MessageBubble extends Ellipse2D{
      */
     public void setBubbleType(String t){
         type = t;
+    }
+
+    private byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
     }
 }

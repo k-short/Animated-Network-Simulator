@@ -153,7 +153,7 @@ public class NetworkGUI {
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
         StyleConstants.setBold(center, true);
-        StyleConstants.setFontSize(center, 18);
+        StyleConstants.setFontSize(center, 12);
 
         //Set red data box with larger size and give it a frame
         dataBoxRed.setPreferredSize(new Dimension(400, 100));
