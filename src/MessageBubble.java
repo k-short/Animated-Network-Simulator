@@ -298,8 +298,8 @@ public class MessageBubble extends Ellipse2D{
                 if (currentBounds[1].isInBounds(currX, currY, width)) {
                     sinePanel.setVisible(false);
                     bubblePane.setVisible(true);
-                    data = "  H3" + "  H2" + "  H1" + "  A";
-                    bubblePane.setText(data);
+                    //data = "  H3" + "  H2" + "  H1" + "  A";
+                    bubblePane.setText(getDataLinkFrame(message));
                     currentLayer = 3;
                 }
             } else if (currentLayer == 3) {
@@ -423,5 +423,9 @@ public class MessageBubble extends Ellipse2D{
 
     public JTextPane getBubblePane() {
         return bubblePane;
+    }
+
+    public void setCurrentBounds(Bounds[] bounds){
+        currentBounds = bounds;
     }
 }

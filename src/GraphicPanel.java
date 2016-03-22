@@ -580,6 +580,7 @@ public class GraphicPanel extends JPanel{
                         bubbleRed = bubbleRedCopy;
                         bubbleRed.setHostLayerBounds(hostLayerBoundsRed);
                         bubbleRed.setDestLayerBounds(destLayerBoundsRed);
+                        bubbleRed.setCurrentBounds(destLayerBoundsRed);
                         bubbleRed.setBubblePane(pane);
                         bubbleRed.setSineWavePanel(panel);
                         redPos = 1;
