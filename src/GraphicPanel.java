@@ -17,6 +17,8 @@ public class GraphicPanel extends JPanel{
 
     Graphics2D g2;
 
+    private int speed =40;
+
     boolean timerReady = false;
     boolean resend = false;
     boolean makeCopy = false;
@@ -498,7 +500,7 @@ public class GraphicPanel extends JPanel{
         bubbleACK.setTarget(pathACK.get(0));
 
         //Create a timer for animation
-        Timer timer = new Timer(30, null);
+        Timer timer = new Timer(speed, null);
 
         //Animation is currently running
         isRunning = true;
@@ -658,7 +660,15 @@ public class GraphicPanel extends JPanel{
      */
     public void stop(){
         isRunning = false;
-        bubbleRed.reset();
+        timerReady = false;
+        resend = false;
+        makeCopy = false;
+        discarded = false;
+        ackDone = false;
+
+        counter = 0;
+
+        bubbleRed.reset(bubbleX, bubbleY);
         bubbleBlue.reset();
     }
 }

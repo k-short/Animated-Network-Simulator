@@ -357,6 +357,24 @@ public class MessageBubble extends Ellipse2D{
     }
 
     /**
+     * Reset message bubble's position, given starting coordinates.
+     */
+    public void reset(double x, double y){
+        startX = x;
+        startY = y;
+
+        bubble = new Ellipse2D.Double(startX, startY, width, height);
+        currX = startX;
+        currY = startY;
+        currentBounds = hostLayerBounds;
+        currentLayer = 1;
+        bubblePane.setVisible(true);
+        bubblePane.setText("");
+        sinePanel.setVisible(false);
+        sinePanel.setIsSine(false);
+    }
+
+    /**
      * Set message to be transmitted in this message bubble.
      */
     public void setMessage(String msg){
