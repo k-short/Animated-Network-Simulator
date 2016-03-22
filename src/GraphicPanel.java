@@ -24,6 +24,7 @@ public class GraphicPanel extends JPanel{
     boolean makeCopy = false;
     boolean discarded = false;
     boolean ackDone = false;
+    boolean isPaused = false;
 
     int counter = 0;
 
@@ -520,7 +521,7 @@ public class GraphicPanel extends JPanel{
             @Override
             public void actionPerformed(ActionEvent e) {
                 //If red or bubble still moving then don't stop timer
-                if(isRunning & (redMoving || blueMoving)) {
+                if(isRunning && (redMoving || blueMoving)) {
                     //Move the red bubble
                     if(redMoving && !waitRed) { //Not at next target yet
                         if (bubbleRed.move()) {
@@ -670,5 +671,9 @@ public class GraphicPanel extends JPanel{
 
         bubbleRed.reset(bubbleX, bubbleY);
         bubbleBlue.reset();
+    }
+
+    public void setPaused(boolean paused) {
+        isPaused = paused;
     }
 }
