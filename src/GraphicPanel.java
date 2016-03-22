@@ -21,6 +21,8 @@ public class GraphicPanel extends JPanel{
     boolean resend = false;
     boolean makeCopy = false;
     boolean discarded = false;
+    boolean ackDone = false;
+
     int counter = 0;
 
     //Types of nodes
@@ -265,7 +267,10 @@ public class GraphicPanel extends JPanel{
         }
 
         bubbleBlue.draw(g2);
-        bubbleACK.draw(g2);
+
+        if(!ackDone) {
+            bubbleACK.draw(g2);
+        }
 
         //Add desktop and router icons
         g2.drawImage(scaledH1,host1X, host1Y, null);
@@ -508,44 +513,56 @@ public class GraphicPanel extends JPanel{
             boolean blueMoving = true;
             boolean ackMoving = false;
             //To know when ack has finished moving
-            boolean ackDone = false;
+            boolean waitRed = false;
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 //If red or bubble still moving then don't stop timer
                 if(isRunning & (redMoving || blueMoving)) {
                     //Move the red bubble
-                    if(redMoving && !ackMoving) { //Not at next target yet
+                    if(redMoving && !waitRed) { //Not at next target yet
                         if (bubbleRed.move()) {
                             repaint();
                         }
                         else { //At target, update next target in path
-                            if (redPos < pathRed.size() - 1) {
+                            if (redPos < pathRed.size() - 1 && !resend) {
                                 redPos++;
 
                                 //At R1, make a copy to leave there
-                                if(redPos == 2 && !ackDone && !resend){
+                                if(redPos == 2 && !ackDone){
                                     makeCopy = true;
                                     timerReady = true;
                                     repaint();
                                 }
 
-                                //At R2, now ACK needs to be sent
-                                if(redPos == 3 && !ackDone && !resend){
+                                //At R2 need to wait
+                                if(redPos == 3 && !ackDone){
                                     //redMoving = false;
-                                    ackMoving = true;
-                                    repaint();
+                                    waitRed = true;
+                                    //repaint();
                                 }
 
                                 bubbleRed.setTarget(pathRed.get(redPos));
-                            } else {
+                            }
+                            else if(redPos < pathRed.size() - 1){
+                                redPos++;
+
+                                //At R2, now ACK needs to be sent
+                                if(redPos == 3 && !ackDone){
+                                    ackMoving = true;
+                                    waitRed = false;
+                                }
+
+                                bubbleRed.setTarget(pathRed.get(redPos));
+                            }
+                            else {
                                 redMoving = false;
                             }
                         }
                     }
 
                     //Move the ack bubble if second time red bubble has been sent
-                    if(ackMoving && counter >= 100 && resend){
+                    if(ackMoving && resend){
                         if(bubbleACK.move()){
                             repaint();
                         }
@@ -558,16 +575,20 @@ public class GraphicPanel extends JPanel{
                         }
                     }else if(counter >=100 && !resend){
                         discarded = true;
+                        JTextPane pane = bubbleRed.getBubblePane();
+                        SineWavePanel panel = bubbleRed.getSinePanel();
                         bubbleRed = bubbleRedCopy;
                         bubbleRed.setHostLayerBounds(hostLayerBoundsRed);
                         bubbleRed.setDestLayerBounds(destLayerBoundsRed);
-                        redPos = 2;
-                        bubbleRedCopy.setTarget(pathRed.get(3));
-                        ackMoving = false;
+                        bubbleRed.setBubblePane(pane);
+                        bubbleRed.setSineWavePanel(panel);
+                        redPos = 1;
+                        bubbleRedCopy.setTarget(pathRed.get(2));
+                        waitRed = false;
                         counter = 0;
                         resend = true;
                     }
-                    else if(ackMoving && counter < 100){
+                    else if(waitRed && counter < 100){
                         counter ++;
                     }
 

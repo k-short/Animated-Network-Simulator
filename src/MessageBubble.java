@@ -408,4 +408,20 @@ public class MessageBubble extends Ellipse2D{
         }
         return data;
     }
+
+    public void setBubblePane(JTextPane pane){
+        bubblePane = pane;
+    }
+
+    public void setSineWavePanel(SineWavePanel panel){
+        sinePanel = panel;
+    }
+
+    public SineWavePanel getSinePanel() {
+        return sinePanel;
+    }
+
+    public JTextPane getBubblePane() {
+        return bubblePane;
+    }
 }
