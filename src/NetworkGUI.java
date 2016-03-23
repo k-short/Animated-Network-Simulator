@@ -38,6 +38,9 @@ public class NetworkGUI {
     //Start button
     private JButton startButton;
 
+    //Pause button
+    private JButton pauseButton;
+
     //Info panel
     private JPanel bottomPanel;
 
@@ -51,6 +54,9 @@ public class NetworkGUI {
     //Panel to hold the sine wave
     SineWavePanel sinePanelRed;
     SineWavePanel sinePanelBlue;
+
+    //Boolean for if graphic panel is currently paused
+    private boolean paused = false;
 
     /**
      * Default constructor for the GUI.
@@ -120,8 +126,13 @@ public class NetworkGUI {
         resetButton = new JButton("Reset");
         resetButton.addActionListener(new ResetButtonListener());
 
+        //Create pause button and add listener
+        pauseButton = new JButton("Pause");
+        pauseButton.addActionListener(new PauseButtonListener());
+
         //Add button to panel
         topPanel.add(startButton);
+        topPanel.add(pauseButton);
         topPanel.add(resetButton);
     }
 
@@ -218,8 +229,30 @@ public class NetworkGUI {
         @Override
         public void actionPerformed(ActionEvent e) {
             startButton.setEnabled(true);
+            paused = false;
+            pauseButton.setText("Pause");
             graphicPanel.stop();
             graphicPanel.repaint();
+        }
+    }
+
+    /**
+     * Private class for pause button listener.
+     * Pause the animation of the GraphicPanel object.
+     */
+    private class PauseButtonListener implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(paused){
+                graphicPanel.setPaused(false);
+                pauseButton.setText("Pause");
+                paused = false;
+            }else {
+                graphicPanel.setPaused(true);
+                pauseButton.setText("Play");
+                paused = true;
+            }
         }
     }
 }

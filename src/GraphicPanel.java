@@ -521,7 +521,7 @@ public class GraphicPanel extends JPanel{
             @Override
             public void actionPerformed(ActionEvent e) {
                 //If red or bubble still moving then don't stop timer
-                if(isRunning && (redMoving || blueMoving)) {
+                if(isRunning && (redMoving || blueMoving) && !isPaused) {
                     //Move the red bubble
                     if(redMoving && !waitRed) { //Not at next target yet
                         if (bubbleRed.move()) {
@@ -607,7 +607,7 @@ public class GraphicPanel extends JPanel{
                             blueMoving = false;
                         }
                     }
-                }else{
+                }else if(!isPaused){
                     timer.stop();
                 }
             }
@@ -666,6 +666,7 @@ public class GraphicPanel extends JPanel{
         makeCopy = false;
         discarded = false;
         ackDone = false;
+        isPaused = false;
 
         counter = 0;
 
