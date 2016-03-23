@@ -172,6 +172,9 @@ public class GraphicPanel extends JPanel{
     Bounds[] hostLayerBoundsBlue;
     Bounds[] destLayerBoundsBlue;
 
+    //Bounds for all routers
+    Bounds[] routerBounds;
+
     //Keep track of if animation is running.  False by default.
     private boolean isRunning = false;
 
@@ -207,9 +210,11 @@ public class GraphicPanel extends JPanel{
         //Assign bounds to bubble
         bubbleRed.setHostLayerBounds(hostLayerBoundsRed);
         bubbleRed.setDestLayerBounds(destLayerBoundsRed);
+        bubbleRed.setRouterBounds(routerBounds);
 
         bubbleBlue.setHostLayerBounds(hostLayerBoundsBlue);
         bubbleBlue.setDestLayerBounds(destLayerBoundsBlue);
+        bubbleBlue.setRouterBounds(routerBounds);
 
         //Load host and router images, layer images
         try {
@@ -476,6 +481,12 @@ public class GraphicPanel extends JPanel{
 
         Bounds phy3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, PHY_DEST);
 
+        //Create bounds for each router
+        Bounds r1 = new Bounds(router1X, router1X + IMAGE_WIDTH, router1Y, router1Y + IMAGE_HEIGHT, ROUTER);
+        Bounds r2 = new Bounds(router2X, router2X + IMAGE_WIDTH, router2Y, router2Y + IMAGE_HEIGHT, ROUTER);
+        Bounds r3 = new Bounds(router3X, router3X + IMAGE_WIDTH, router3Y, router3Y + IMAGE_HEIGHT, ROUTER);
+
+
         //Add bounds in order of being visited.
         hostLayerBoundsRed = new Bounds[]{app1, pres1, sess1, trans1, net1, dat1, phy1};
         destLayerBoundsRed = new Bounds[]{phy2, dat2, net2, trans2, sess2, pres2, app2};
@@ -483,6 +494,9 @@ public class GraphicPanel extends JPanel{
         //Add second destination bounds for blue bubble.
         hostLayerBoundsBlue = hostLayerBoundsRed;
         destLayerBoundsBlue = new Bounds[]{phy3, dat3, net3, trans3, sess3, pres3, app3};
+
+        //Add router bounds to bounds array
+        routerBounds = new Bounds[]{r1, r2, r3};
     }
 
     /**
@@ -584,6 +598,7 @@ public class GraphicPanel extends JPanel{
                         bubbleRed.setHostLayerBounds(hostLayerBoundsRed);
                         bubbleRed.setDestLayerBounds(destLayerBoundsRed);
                         bubbleRed.setCurrentBounds(destLayerBoundsRed);
+                        bubbleRed.setRouterBounds(routerBounds);
                         bubbleRed.setBubblePane(pane);
                         bubbleRed.setSineWavePanel(panel);
                         redPos = 1;

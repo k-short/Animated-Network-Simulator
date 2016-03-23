@@ -73,6 +73,9 @@ public class MessageBubble extends Ellipse2D{
     Bounds[] hostLayerBounds;
     Bounds[] destLayerBounds;
 
+    //Bounds for the routers
+    Bounds[] routerBounds;
+
     //Bounds currently looking for
     Bounds[] currentBounds;
 
@@ -84,6 +87,9 @@ public class MessageBubble extends Ellipse2D{
 
     //Message being set in the bubble
     private String message;
+
+    //Data-link frame
+    String frame;
 
     //Current packet, changes in each layer
     private String currentPacket;
@@ -101,11 +107,17 @@ public class MessageBubble extends Ellipse2D{
         color = c;
 
         bubble = new Ellipse2D.Double(startX, startY, width, height);
+
+        message = "A";
+        frame = getDataLinkFrame(message);
     }
 
     public MessageBubble(JTextPane pane, SineWavePanel sine){
         bubblePane = pane;
         sinePanel = sine;
+
+        message = "A";
+        frame = getDataLinkFrame(message);
     }
 
     /*
@@ -267,8 +279,7 @@ public class MessageBubble extends Ellipse2D{
                 }
             }else if(currentLayer == 6){ //Data-link layer
                 if (currentBounds[5].isInBounds(currX, currY, width)) {
-                    //data = "  H3" + "  H2" + "  H1" + "  A";
-                    bubblePane.setText(getDataLinkFrame(currentPacket));
+                    bubblePane.setText(frame);
                     currentLayer = 7;
                 }
             }else if(currentLayer == 7){
@@ -293,13 +304,24 @@ public class MessageBubble extends Ellipse2D{
                     sinePanel.setIsSine(false);
                     sinePanel.repaint();
                     currentLayer = 2;
+                }else {
+                    for (int i = 0; i < routerBounds.length; i++) {
+                        if (routerBounds[i].isInBounds(currX, currY, width)) {
+                            bubblePane.setText(frame);
+                            bubblePane.setVisible(true);
+                            sinePanel.setVisible(false);
+                            break;
+                        } else {
+                            bubblePane.setVisible(false);
+                            sinePanel.setVisible(true);
+                        }
+                    }
                 }
             } else if (currentLayer == 2) {
                 if (currentBounds[1].isInBounds(currX, currY, width)) {
                     sinePanel.setVisible(false);
                     bubblePane.setVisible(true);
-                    //data = "  H3" + "  H2" + "  H1" + "  A";
-                    bubblePane.setText(getDataLinkFrame(message));
+                    bubblePane.setText(frame);
                     currentLayer = 3;
                 }
             } else if (currentLayer == 3) {
@@ -338,6 +360,13 @@ public class MessageBubble extends Ellipse2D{
      */
     public void setDestLayerBounds(Bounds[] dest){
         destLayerBounds = dest;
+    }
+
+    /**
+     * Set bounds of routers in panel.
+     */
+    public void setRouterBounds(Bounds[] router){
+        routerBounds = router;
     }
 
     /**
