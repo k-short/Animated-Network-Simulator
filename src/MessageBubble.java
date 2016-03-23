@@ -419,12 +419,12 @@ public class MessageBubble extends Ellipse2D{
         crc = new CRC32();
 
         String frame = "";
-        String preliminary = "AAAAAAAAAAAAAA";
-        String SFD = "AB";
-        String dest = "4A301021101A";
-        String src = "47201B2E08EE";
-        String type = "DBA0";
-        String data = "41000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        String preliminary = "  AAAAAAAAAAAAAA";
+        String SFD = "  AB";
+        String dest = "  4A301021101A";
+        String src = "  47201B2E08EE";
+        String type = "  DBA0";
+        String data = "  41000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
         //Get CRC
         byte[] bytes = hexStringToByteArray(dest + src + type + data);
@@ -433,14 +433,15 @@ public class MessageBubble extends Ellipse2D{
         Long CRC_LONG = new Long(0);
         String crc32 = CRC_LONG.toHexString(CRC);
         crc32 = crc32.toUpperCase();
+        String crc32F = "  " + crc32;
 
-        frame = preliminary + "\n" + SFD + "\n" + dest + "\n" + src + "\n" + type + "\n" + data + "\n" + crc32;
+        frame = preliminary + "\n" + SFD + "\n" + dest + "\n" + src + "\n" + type + "\n" + data + "\n" + crc32F;
 
         return frame;
     }
 
     /**
-     * Set type.  ACK message bubble will use this method to set type "ACK".
+     * Set type. ACK message bubble will use this method to set type "ACK".
      */
     public void setBubbleType(String t){
         type = t;
