@@ -151,7 +151,8 @@ public class NetworkGUI {
 
 
         graphicPanel = new GraphicPanel(bubbleR, bubbleB);
-        graphicPanel.setPreferredSize(new Dimension(1200, 600));
+        graphicPanel.setPreferredSize(new Dimension(1200, 500));
+        graphicPanel.setMinimumSize(new Dimension(1200, 500));
     }
 
     /**
@@ -161,6 +162,9 @@ public class NetworkGUI {
     private void buildBottomPanel(){
         bottomPanel = new JPanel();
         bottomPanel.setBorder(new EmptyBorder(10, 10, 20, 10));
+
+        //Dimension for data boxes
+        Dimension dim = new Dimension(420, 100);
 
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
@@ -172,7 +176,7 @@ public class NetworkGUI {
         StyleConstants.setFontSize(left, 8);
 
         //Set red data box with larger size and give it a frame
-        dataBoxRed.setPreferredSize(new Dimension(400, 100));
+        dataBoxRed.setPreferredSize(dim);
 
         Border borderRed = BorderFactory.createLineBorder(Color.RED);
         dataBoxRed.setBorder(borderRed);
@@ -181,13 +185,13 @@ public class NetworkGUI {
         docRed.setParagraphAttributes(0, docRed.getLength(), left, false);
 
         //Set up and add sine panel red
-        sinePanelRed.setPreferredSize(new Dimension(410, 100));
+        sinePanelRed.setPreferredSize(dim);
         sinePanelRed.setBorder(borderRed);
         sinePanelRed.setIsSine(false);
         sinePanelRed.setVisible(false);
 
         //Set blue data box with larger size and give it a frame
-        dataBoxBlue.setPreferredSize(new Dimension(400, 100));
+        dataBoxBlue.setPreferredSize(dim);
 
         Border borderBlue = BorderFactory.createLineBorder(Color.BLUE);
         dataBoxBlue.setBorder(borderBlue);
@@ -196,7 +200,7 @@ public class NetworkGUI {
         docBlue.setParagraphAttributes(0, docBlue.getLength(), left, false);
 
         //Set up and add sine panel blue
-        sinePanelBlue.setPreferredSize(new Dimension(410, 100));
+        sinePanelBlue.setPreferredSize(dim);
         sinePanelBlue.setBorder(borderBlue);
         sinePanelBlue.setIsSine(false);
         sinePanelBlue.setVisible(false);
