@@ -687,7 +687,7 @@ public class GraphicPanel extends JPanel{
 
         bubbleRed.reset(bubbleX, bubbleY);
         bubbleBlue.reset();
-        bubbleACK.reset(bubbleACKX, bubbleACKY);
+        bubbleACK.resetACK(bubbleACKX, bubbleACKY);
     }
 
     public void setPaused(boolean paused) {

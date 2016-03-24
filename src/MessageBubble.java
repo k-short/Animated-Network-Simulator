@@ -404,6 +404,22 @@ public class MessageBubble extends Ellipse2D{
     }
 
     /**
+     * Reset method for ACK bubble.
+     * Different since it has no text panes.
+     */
+    public void resetACK(double x, double y){
+        startX = x;
+        startY = y;
+
+        bubble = new Ellipse2D.Double(startX, startY, width, height);
+        currX = startX;
+        currY = startY;
+        currentBounds = hostLayerBounds;
+        currentLayer = 1;
+    }
+
+
+    /**
      * Set message to be transmitted in this message bubble.
      */
     public void setMessage(String msg){
