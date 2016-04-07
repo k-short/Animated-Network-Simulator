@@ -57,15 +57,20 @@ public class GraphicPanel extends JPanel{
     //Desktop and router images
     private BufferedImage hostImage1;
     private BufferedImage hostImage2;
-    private BufferedImage hostImage3;
     private BufferedImage routerImage1;
     private BufferedImage routerImage2;
     private BufferedImage routerImage3;
+    private BufferedImage routerImage4;
+    private BufferedImage routerImage5;
+    private BufferedImage routerImage6;
+    private BufferedImage routerImage7;
+    private BufferedImage routerImage8;
+
+
 
     //7-layer images
     private BufferedImage layersImage1;
     private BufferedImage layersImage2;
-    private BufferedImage layersImage3;
 
     //Timer image for ACK
     private BufferedImage timerImage;
@@ -73,14 +78,18 @@ public class GraphicPanel extends JPanel{
     //Scaled images
     private Image scaledH1;
     private Image scaledH2;
-    private Image scaledH3;
+
     private Image scaledR1;
     private Image scaledR2;
     private Image scaledR3;
+    private Image scaledR4;
+    private Image scaledR5;
+    private Image scaledR6;
+    private Image scaledR7;
+    private Image scaledR8;
+
     private Image scaledL1;
     private Image scaledL2;
-    private Image scaledL3;
-    private Image scaledTimer;
 
     //Icon String labels
     private String host1Label = "H1";
@@ -95,8 +104,6 @@ public class GraphicPanel extends JPanel{
     private int host1Y;
     private int host2X;
     private int host2Y;
-    private int host3X;
-    private int host3Y;
 
     private int router1X;
     private int router1Y;
@@ -104,20 +111,26 @@ public class GraphicPanel extends JPanel{
     private int router2Y;
     private int router3X;
     private int router3Y;
+    private int router4X;
+    private int router4Y;
+    private int router5X;
+    private int router5Y;
+    private int router6X;
+    private int router6Y;
+    private int router7X;
+    private int router7Y;
+    private int router8X;
+    private int router8Y;
 
     private int layer1X;
     private int layer1Y;
     private int layer2X;
     private int layer2Y;
-    private int layer3X;
-    private int layer3Y;
 
     private int host1LabelX;
     private int host1LabelY;
     private int host2LabelX;
     private int host2LabelY;
-    private int host3LabelX;
-    private int host3LabelY;
 
     private int router1LabelX;
     private int router1LabelY;
@@ -125,21 +138,27 @@ public class GraphicPanel extends JPanel{
     private int router2LabelY;
     private int router3LabelX;
     private int router3LabelY;
+    private int router4LabelX;
+    private int router4LabelY;
+    private int router5LabelX;
+    private int router5LabelY;
+    private int router6LabelX;
+    private int router6LabelY;
+    private int router7LabelX;
+    private int router7LabelY;
+    private int router8LabelX;
+    private int router8LabelY;
 
     private int timerX;
     private int timerY;
 
     //Starting image coordinates (coords for host 1)
-    private final int STARTING_IMAGE_X_1 = 200;
-    private final int STARTING_IMAGE_Y_1 = 140;
+    private final int STARTING_IMAGE_X_1 = 140;
+    private final int STARTING_IMAGE_Y_1 = 100;
 
     //Starting image coordinates for layer 2
-    private final int STARTING_IMAGE_X_2 = 800;
-    private final int STARTING_IMAGE_Y_2 = 140;
-
-    //Starting image coordinates for layer 3 (layer in MIDDLE)
-    private final int STARTING_IMAGE_X_3 = 550;
-    private final int STARTING_IMAGE_Y_3 = 30;
+    private final int STARTING_IMAGE_X_2 = 900;
+    private final int STARTING_IMAGE_Y_2 = 100;
 
     //Image sizes
     private final int IMAGE_WIDTH = 50;
@@ -216,37 +235,8 @@ public class GraphicPanel extends JPanel{
         bubbleBlue.setDestLayerBounds(destLayerBoundsBlue);
         bubbleBlue.setRouterBounds(routerBounds);
 
-        //Load host and router images, layer images
-        try {
-            hostImage1 = ImageIO.read(getClass().getResource("/resources/images/desktop_1_icon.png"));
-            hostImage2 = ImageIO.read(getClass().getResource("/resources/images/desktop_2_icon.png"));
-            hostImage3 = ImageIO.read(getClass().getResource("/resources/images/desktop_3_icon.png"));
-
-            routerImage1 = ImageIO.read(getClass().getResource("/resources/images/router_1_icon.png"));
-            routerImage2 = ImageIO.read(getClass().getResource("/resources/images/router_2_icon.png"));
-            routerImage3 = ImageIO.read(getClass().getResource("/resources/images/router_3_icon.png"));
-
-            scaledH1 = hostImage1.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-            scaledH2 = hostImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-            scaledH3 = hostImage3.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-
-            scaledR1 = routerImage1.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-            scaledR2 = routerImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-            scaledR3 = routerImage3.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-
-            layersImage1 = ImageIO.read(getClass().getResource("/resources/images/7_layer_network_1.png"));
-            layersImage2 = ImageIO.read(getClass().getResource("/resources/images/7_layer_network_2.png"));
-            layersImage3 = ImageIO.read(getClass().getResource("/resources/images/7_layer_network_3.png"));
-
-            scaledL1 = layersImage1.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
-            scaledL2 = layersImage2.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
-            scaledL3 = layersImage3.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
-
-            timerImage = ImageIO.read(getClass().getResource("/resources/images/timer_icon.png"));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //Load images
+        loadImages();
 
         //Create graph
         graph = new Graph();
@@ -283,16 +273,13 @@ public class GraphicPanel extends JPanel{
         //Add desktop and router icons
         g2.drawImage(scaledH1,host1X, host1Y, null);
         g2.drawImage(scaledH2,host2X, host2Y, null);
-        g2.drawImage(scaledH3,host3X, host3Y, null);
 
         g2.drawImage(scaledR1,router1X, router1Y, null);
         g2.drawImage(scaledR2,router2X, router2Y, null);
-        g2.drawImage(scaledR3,router3X, router3Y, null);
 
         //Add 7 layer images
         g2.drawImage(scaledL1, layer1X, layer1Y, null);
         g2.drawImage(scaledL2, layer2X, layer2Y, null);
-        g2.drawImage(scaledL3, layer3X, layer3Y, null);
 
         if(timerReady) {
             g2.drawImage(timerImage, timerX, timerY, null);
@@ -302,10 +289,8 @@ public class GraphicPanel extends JPanel{
         g2.setColor(Color.black);
         g2.drawString(host1Label, host1LabelX, host1LabelY);
         g2.drawString(host2Label, host2LabelX, host2LabelY);
-        g2.drawString(host3Label, host3LabelX, host3LabelY);
         g2.drawString(router1Label, router1LabelX, router1LabelY);
         g2.drawString(router2Label, router2LabelX, router2LabelY);
-        g2.drawString(router3Label, router3LabelX, router3LabelY);
 
         //Draw lines in between images
         // i.e. H1 - R1 - R2 - H2
@@ -317,14 +302,10 @@ public class GraphicPanel extends JPanel{
         g2.draw(new Line2D.Double(router2X+IMAGE_WIDTH, router2Y+(IMAGE_HEIGHT/2), host2X, host2Y+(IMAGE_HEIGHT/2)));
         g2.draw(new Line2D.Double(layer1X + (LAYER_WIDTH/2), layer1Y + LAYER_HEIGHT, layer1X + (LAYER_WIDTH/2), host1Y));
         g2.draw(new Line2D.Double(layer2X + (LAYER_WIDTH/2), layer2Y + LAYER_HEIGHT, layer2X + (LAYER_WIDTH/2), host2Y));
-        g2.draw(new Line2D.Double(router1X + (IMAGE_WIDTH/2), router1Y + (IMAGE_HEIGHT/2), router3X + (IMAGE_WIDTH/2), router3Y+IMAGE_HEIGHT));
-        g2.draw(new Line2D.Double(router3X + IMAGE_WIDTH, router3Y + (IMAGE_HEIGHT/2), host3X, host3Y + (IMAGE_HEIGHT/2)));
-        g2.draw(new Line2D.Double(host3X + (IMAGE_WIDTH/2), host3Y, layer3X + (LAYER_WIDTH/2), layer3Y + LAYER_HEIGHT));
     }
 
     /**
      * Sets image coordinates for assignment 2
-     * This includes a 3rd 7-layers and a 3 host and router
      * All image coordinates are just going to be hard-coded unlike in first assignment
      */
     private void setImageCoordinates(){
@@ -339,9 +320,6 @@ public class GraphicPanel extends JPanel{
         layer2X = STARTING_IMAGE_X_2;
         layer2Y = STARTING_IMAGE_Y_2;
 
-        layer3X = STARTING_IMAGE_X_3;
-        layer3Y = STARTING_IMAGE_Y_3;
-
         //Set host machine coordinates
         //Each is centered below each OSI layer
         host1X = layer1X + layerCenter;
@@ -350,18 +328,12 @@ public class GraphicPanel extends JPanel{
         host2X = layer2X + layerCenter;
         host2Y = layer2Y + LAYER_HEIGHT + layerHostGap;
 
-        host3X = layer3X + layerCenter;
-        host3Y = layer3Y + LAYER_HEIGHT + layerHostGap;
-
         //Set router machine coordinates
         router1X = host1X + routerXDiff;
         router1Y = host1Y;
 
         router2X = host2X - routerXDiff;
         router2Y = host2Y;
-
-        router3X = host3X - routerXDiff - 40 ;
-        router3Y = host3Y;
 
         //Set bubble starting coordinates
         bubbleX = layer1X + (LAYER_WIDTH / 2) - (BUBBLE_SIZE/2);
@@ -388,9 +360,6 @@ public class GraphicPanel extends JPanel{
         host2LabelX = host2X + IMAGE_WIDTH;
         host2LabelY = host2Y;
 
-        host3LabelX = host3X + IMAGE_WIDTH;
-        host3LabelY = host3Y;
-
         router1LabelX = router1X + IMAGE_WIDTH;
         router1LabelY = router1Y;
 
@@ -399,6 +368,21 @@ public class GraphicPanel extends JPanel{
 
         router3LabelX = router3X + IMAGE_WIDTH;
         router3LabelY = router3Y;
+
+        router4LabelX = router4X + IMAGE_WIDTH;
+        router4LabelY = router4Y;
+
+        router5LabelX = router5X + IMAGE_WIDTH;
+        router5LabelY = router5Y;
+
+        router6LabelX = router6X + IMAGE_WIDTH;
+        router6LabelY = router6Y;
+
+        router7LabelX = router7X + IMAGE_WIDTH;
+        router7LabelY = router7Y;
+
+        router8LabelX = router8X + IMAGE_WIDTH;
+        router8LabelY = router8Y;
     }
 
     /**
@@ -414,7 +398,6 @@ public class GraphicPanel extends JPanel{
         //Starts off at layer starting coordinate
         double currentY1 = layer1Y;
         double currentY2 = layer2Y;
-        double currentY3 = layer3Y;
 
         double layerSize = LAYER_HEIGHT / 7;
 
@@ -460,27 +443,6 @@ public class GraphicPanel extends JPanel{
 
         Bounds phy2 = new Bounds(layer2X, layer2X + LAYER_WIDTH,currentY2, currentY2 + layerSize, PHY_DEST);
 
-        //Dest layers for blue
-        Bounds app3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, APP_DEST);
-        currentY3 += layerSize;
-
-        Bounds pres3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, PRES_DEST);
-        currentY3 += layerSize;
-
-        Bounds sess3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, SESS_DEST);
-        currentY3 += layerSize;
-
-        Bounds trans3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, TRANS_DEST);
-        currentY3 += layerSize;
-
-        Bounds net3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, NET_DEST);
-        currentY3 += layerSize;
-
-        Bounds dat3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, DL_DEST);
-        currentY3 += layerSize;
-
-        Bounds phy3 = new Bounds(layer3X, layer3X + LAYER_WIDTH,currentY3, currentY3 + layerSize, PHY_DEST);
-
         //Create bounds for each router
         Bounds r1 = new Bounds(router1X, router1X + IMAGE_WIDTH, router1Y, router1Y + IMAGE_HEIGHT, ROUTER);
         Bounds r2 = new Bounds(router2X, router2X + IMAGE_WIDTH, router2Y, router2Y + IMAGE_HEIGHT, ROUTER);
@@ -493,7 +455,6 @@ public class GraphicPanel extends JPanel{
 
         //Add second destination bounds for blue bubble.
         hostLayerBoundsBlue = hostLayerBoundsRed;
-        destLayerBoundsBlue = new Bounds[]{phy3, dat3, net3, trans3, sess3, pres3, app3};
 
         //Add router bounds to bounds array
         routerBounds = new Bounds[]{r1, r2, r3};
@@ -640,31 +601,22 @@ public class GraphicPanel extends JPanel{
         double imageY = host1Y + IMAGE_HEIGHT/2 - BUBBLE_SIZE/2;
         double imageYACK = host1Y + IMAGE_HEIGHT/2 - BUBBLE_ACK_SIZE/2;
 
-        //Y coordinate for H3 and R3
-        double imageY3 = host3Y + IMAGE_HEIGHT/2 - BUBBLE_SIZE/2;
-
         //Nodes, Layer1 not including since it is the starting point for both bubbles
         Node nodeH1 = new Node(host1X, imageY, HOST);
         Node nodeH2 = new Node(host2X, imageY, HOST);
-        Node nodeH3 = new Node(host3X, imageY3, HOST);
 
         Node nodeR1 = new Node(router1X, imageY, ROUTER);
         Node nodeR2 = new Node(router2X, imageY, ROUTER);
-        Node nodeR3 = new Node(router3X, imageY3, ROUTER);
 
         Node nodeL2 = new Node(host2X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer2Y, LAYER);
-        Node nodeL3 = new Node(host3X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer3Y, LAYER);
 
         Node nodeR1ACK = new Node(router1X, imageYACK, ROUTER);
 
         graph.addNode(nodeH1);
         graph.addNode(nodeH2);
-        graph.addNode(nodeH3);
         graph.addNode(nodeR1);
         graph.addNode(nodeR2);
-        graph.addNode(nodeR3);
         graph.addNode(nodeL2);
-        graph.addNode(nodeL3);
 
         //Secondary node for R1 for ACK -- size is different
         graph.addNode(nodeR1ACK);
@@ -692,5 +644,48 @@ public class GraphicPanel extends JPanel{
 
     public void setPaused(boolean paused) {
         isPaused = paused;
+    }
+
+    /**
+     * Load all images to be used.
+     */
+    private void loadImages(){
+        //Load host and router images, layer images
+        try {
+            layersImage1 = ImageIO.read(getClass().getResource("/resources/images/7_layer_network_1.png"));
+            layersImage2 = ImageIO.read(getClass().getResource("/resources/images/7_layer_network_2.png"));
+
+            hostImage1 = ImageIO.read(getClass().getResource("/resources/images/desktop_1_icon.png"));
+            hostImage2 = ImageIO.read(getClass().getResource("/resources/images/desktop_2_icon.png"));
+
+            routerImage1 = ImageIO.read(getClass().getResource("/resources/images/router_1_icon.png"));
+            routerImage2 = ImageIO.read(getClass().getResource("/resources/images/router_2_icon.png"));
+            routerImage3 = ImageIO.read(getClass().getResource("/resources/images/router_3_icon.png"));
+            routerImage4 = ImageIO.read(getClass().getResource("/resources/images/router_4_icon.png"));
+            routerImage5 = ImageIO.read(getClass().getResource("/resources/images/router_5_icon.png"));
+            routerImage6 = ImageIO.read(getClass().getResource("/resources/images/router_6_icon.png"));
+            routerImage7 = ImageIO.read(getClass().getResource("/resources/images/router_7_icon.png"));
+            routerImage8 = ImageIO.read(getClass().getResource("/resources/images/router_8_icon.png"));
+
+            scaledL1 = layersImage1.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
+            scaledL2 = layersImage2.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
+
+            scaledH1 = hostImage1.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledH2 = hostImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+
+            scaledR1 = routerImage1.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR2 = routerImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR3 = routerImage1.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR4 = routerImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR5 = routerImage1.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR6 = routerImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR7 = routerImage1.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR8 = routerImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+
+            timerImage = ImageIO.read(getClass().getResource("/resources/images/timer_icon.png"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
