@@ -154,11 +154,11 @@ public class GraphicPanel extends JPanel{
 
     //Starting image coordinates (coords for host 1)
     private final int STARTING_IMAGE_X_1 = 140;
-    private final int STARTING_IMAGE_Y_1 = 100;
+    private final int STARTING_IMAGE_Y_1 = 60;
 
     //Starting image coordinates for layer 2
     private final int STARTING_IMAGE_X_2 = 900;
-    private final int STARTING_IMAGE_Y_2 = 100;
+    private final int STARTING_IMAGE_Y_2 = 60;
 
     //Image sizes
     private final int IMAGE_WIDTH = 50;
@@ -276,6 +276,12 @@ public class GraphicPanel extends JPanel{
 
         g2.drawImage(scaledR1,router1X, router1Y, null);
         g2.drawImage(scaledR2,router2X, router2Y, null);
+        g2.drawImage(scaledR3,router3X, router3Y, null);
+        g2.drawImage(scaledR4,router4X, router4Y, null);
+        g2.drawImage(scaledR5,router5X, router5Y, null);
+        g2.drawImage(scaledR6,router6X, router6Y, null);
+        g2.drawImage(scaledR7,router7X, router7Y, null);
+        g2.drawImage(scaledR8,router8X, router8Y, null);
 
         //Add 7 layer images
         g2.drawImage(scaledL1, layer1X, layer1Y, null);
@@ -298,8 +304,15 @@ public class GraphicPanel extends JPanel{
         g2.setStroke(bold);
 
         g2.draw(new Line2D.Double(host1X+IMAGE_WIDTH, host1Y+(IMAGE_HEIGHT/2), router1X, router1Y+(IMAGE_HEIGHT/2)));
-        g2.draw(new Line2D.Double(router1X+IMAGE_WIDTH, router1Y+(IMAGE_HEIGHT/2), router2X, router2Y+(IMAGE_HEIGHT/2)));
-        g2.draw(new Line2D.Double(router2X+IMAGE_WIDTH, router2Y+(IMAGE_HEIGHT/2), host2X, host2Y+(IMAGE_HEIGHT/2)));
+        g2.draw(new Line2D.Double(router1X+(IMAGE_WIDTH/2), router1Y, router2X + (IMAGE_WIDTH/2), router2Y+IMAGE_HEIGHT));
+        g2.draw(new Line2D.Double(router2X + IMAGE_WIDTH, router2Y + (IMAGE_HEIGHT/2), router3X, router3Y + (IMAGE_HEIGHT/2)));
+        g2.draw(new Line2D.Double(router1X + (IMAGE_WIDTH/2), router1Y + IMAGE_HEIGHT, router7X + (IMAGE_WIDTH/2), router7Y));
+        g2.draw(new Line2D.Double(router7X + IMAGE_WIDTH, router7Y + (IMAGE_HEIGHT/2), router8X, router8Y + (IMAGE_HEIGHT/2)));
+        g2.draw(new Line2D.Double(router4X + (IMAGE_WIDTH/2), router1Y, router3X + (IMAGE_WIDTH/2), router3Y + IMAGE_HEIGHT));
+        g2.draw(new Line2D.Double(router4X + (IMAGE_WIDTH/2), router1Y + IMAGE_HEIGHT, router8X + (IMAGE_WIDTH/2), router8Y));
+        g2.draw(new Line2D.Double(router5X + IMAGE_WIDTH, router5Y + (IMAGE_HEIGHT/2), router6X, router6Y + (IMAGE_HEIGHT/2)));
+
+
         g2.draw(new Line2D.Double(layer1X + (LAYER_WIDTH/2), layer1Y + LAYER_HEIGHT, layer1X + (LAYER_WIDTH/2), host1Y));
         g2.draw(new Line2D.Double(layer2X + (LAYER_WIDTH/2), layer2Y + LAYER_HEIGHT, layer2X + (LAYER_WIDTH/2), host2Y));
     }
@@ -312,6 +325,9 @@ public class GraphicPanel extends JPanel{
         int layerCenter = LAYER_WIDTH/2 - IMAGE_WIDTH/2;
         int layerHostGap = 30;
         int routerXDiff = 150;
+        int routerXDiffAngled = 60;
+        int routerYDiff = 130;
+        int hostYDiff = 50;
 
         //Set 7-layer coordinates
         layer1X = STARTING_IMAGE_X_1;
@@ -330,10 +346,28 @@ public class GraphicPanel extends JPanel{
 
         //Set router machine coordinates
         router1X = host1X + routerXDiff;
-        router1Y = host1Y;
+        router1Y = host1Y - hostYDiff;
 
-        router2X = host2X - routerXDiff;
-        router2Y = host2Y;
+        router5X = router1X + routerXDiff;
+        router5Y = router1Y;
+
+        router6X = router5X + routerXDiff;
+        router6Y = router1Y;
+
+        router4X = host2X - routerXDiff;
+        router4Y = host2Y - hostYDiff;
+
+        router2X = router1X + routerXDiffAngled;
+        router2Y = router1Y - routerYDiff;
+
+        router3X = router4X - routerXDiffAngled;
+        router3Y = router4Y - routerYDiff;
+
+        router7X = router1X + routerXDiffAngled;
+        router7Y = router1Y + routerYDiff;
+
+        router8X = router4X - routerXDiffAngled;
+        router8Y = router4Y + routerYDiff;
 
         //Set bubble starting coordinates
         bubbleX = layer1X + (LAYER_WIDTH / 2) - (BUBBLE_SIZE/2);
