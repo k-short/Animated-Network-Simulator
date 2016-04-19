@@ -6,18 +6,9 @@ public class Node {
     private double xCoord;
     private double yCoord;
 
-    //Node type
-    private String type;
-
-    //Types of nodes
-    private final String ROUTER = "ROUTER";
-    private final String HOST = "HOST";
-    private final String LAYER = "LAYER";
-
-    public Node(double x, double y, String t){
+    public Node(double x, double y){
         xCoord = x;
         yCoord = y;
-        type = t;
     }
 
     public double getXCoord() {
@@ -28,7 +19,4 @@ public class Node {
         return yCoord;
     }
 
-    public String getType(){
-        return type;
-    }
 }

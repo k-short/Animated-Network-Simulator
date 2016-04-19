@@ -98,6 +98,12 @@ public class GraphicPanel extends JPanel{
     private String router1Label = "R1";
     private String router2Label = "R2";
     private String router3Label = "R3";
+    private String router4Label = "R4";
+    private String router5Label = "R5";
+    private String router6Label = "R6";
+    private String router7Label = "R7";
+    private String router8Label = "R8";
+
 
     //Image and image label coordinates.
     private int host1X;
@@ -243,8 +249,6 @@ public class GraphicPanel extends JPanel{
 
         //Create nodes for the graph and then add them to the graph.
         createNodes();
-
-        //Create edges !! NOT NEEDED FOR CURRENT ASSIGNMENT
     }
 
     @Override
@@ -297,6 +301,13 @@ public class GraphicPanel extends JPanel{
         g2.drawString(host2Label, host2LabelX, host2LabelY);
         g2.drawString(router1Label, router1LabelX, router1LabelY);
         g2.drawString(router2Label, router2LabelX, router2LabelY);
+        g2.drawString(router3Label, router3LabelX, router3LabelY);
+        g2.drawString(router4Label, router4LabelX, router4LabelY);
+        g2.drawString(router5Label, router5LabelX, router5LabelY);
+        g2.drawString(router6Label, router6LabelX, router6LabelY);
+        g2.drawString(router7Label, router7LabelX, router7LabelY);
+        g2.drawString(router8Label, router8LabelX, router8LabelY);
+
 
         //Draw lines in between images
         // i.e. H1 - R1 - R2 - H2
@@ -311,7 +322,11 @@ public class GraphicPanel extends JPanel{
         g2.draw(new Line2D.Double(router4X + (IMAGE_WIDTH/2), router1Y, router3X + (IMAGE_WIDTH/2), router3Y + IMAGE_HEIGHT));
         g2.draw(new Line2D.Double(router4X + (IMAGE_WIDTH/2), router1Y + IMAGE_HEIGHT, router8X + (IMAGE_WIDTH/2), router8Y));
         g2.draw(new Line2D.Double(router5X + IMAGE_WIDTH, router5Y + (IMAGE_HEIGHT/2), router6X, router6Y + (IMAGE_HEIGHT/2)));
-
+        g2.draw(new Line2D.Double(router2X + IMAGE_WIDTH, router2Y + IMAGE_HEIGHT, router5X + (IMAGE_WIDTH/2), router5Y));
+        g2.draw(new Line2D.Double(router5X + (IMAGE_WIDTH/2), router5Y + IMAGE_HEIGHT, router7X + IMAGE_WIDTH, router7Y));
+        g2.draw(new Line2D.Double(router3X, router3Y + IMAGE_HEIGHT, router6X + IMAGE_WIDTH, router6Y));
+        g2.draw(new Line2D.Double(router6X + (IMAGE_WIDTH/2), router6Y + IMAGE_HEIGHT, router8X, router8Y+ (IMAGE_HEIGHT/4)));
+        g2.draw(new Line2D.Double(router4X + IMAGE_WIDTH, router4Y + (IMAGE_HEIGHT/2), host2X, host2Y + (IMAGE_HEIGHT/2)));
 
         g2.draw(new Line2D.Double(layer1X + (LAYER_WIDTH/2), layer1Y + LAYER_HEIGHT, layer1X + (LAYER_WIDTH/2), host1Y));
         g2.draw(new Line2D.Double(layer2X + (LAYER_WIDTH/2), layer2Y + LAYER_HEIGHT, layer2X + (LAYER_WIDTH/2), host2Y));
@@ -395,7 +410,7 @@ public class GraphicPanel extends JPanel{
         host2LabelY = host2Y;
 
         router1LabelX = router1X + IMAGE_WIDTH;
-        router1LabelY = router1Y;
+        router1LabelY = router1Y + IMAGE_HEIGHT/2;
 
         router2LabelX = router2X + IMAGE_WIDTH;
         router2LabelY = router2Y;
@@ -410,13 +425,13 @@ public class GraphicPanel extends JPanel{
         router5LabelY = router5Y;
 
         router6LabelX = router6X + IMAGE_WIDTH;
-        router6LabelY = router6Y;
+        router6LabelY = router6Y + IMAGE_HEIGHT;
 
-        router7LabelX = router7X + IMAGE_WIDTH;
-        router7LabelY = router7Y;
+        router7LabelX = router7X - 15;
+        router7LabelY = router7Y + IMAGE_HEIGHT;
 
         router8LabelX = router8X + IMAGE_WIDTH;
-        router8LabelY = router8Y;
+        router8LabelY = router8Y + IMAGE_HEIGHT;
     }
 
     /**
@@ -456,7 +471,7 @@ public class GraphicPanel extends JPanel{
 
         Bounds phy1 = new Bounds(layer1X, layer1X + LAYER_WIDTH,currentY1, currentY1 + layerSize, PHY_HOST);
 
-        //Dest layers for red
+        //Dest layers for red and blue
         Bounds app2 = new Bounds(layer2X, layer2X + LAYER_WIDTH,currentY2, currentY2 + layerSize, APP_DEST);
         currentY2 += layerSize;
 
@@ -481,7 +496,11 @@ public class GraphicPanel extends JPanel{
         Bounds r1 = new Bounds(router1X, router1X + IMAGE_WIDTH, router1Y, router1Y + IMAGE_HEIGHT, ROUTER);
         Bounds r2 = new Bounds(router2X, router2X + IMAGE_WIDTH, router2Y, router2Y + IMAGE_HEIGHT, ROUTER);
         Bounds r3 = new Bounds(router3X, router3X + IMAGE_WIDTH, router3Y, router3Y + IMAGE_HEIGHT, ROUTER);
-
+        Bounds r4 = new Bounds(router4X, router4X + IMAGE_WIDTH, router4Y, router4Y + IMAGE_HEIGHT, ROUTER);
+        Bounds r5 = new Bounds(router5X, router5X + IMAGE_WIDTH, router5Y, router5Y + IMAGE_HEIGHT, ROUTER);
+        Bounds r6 = new Bounds(router6X, router6X + IMAGE_WIDTH, router6Y, router6Y + IMAGE_HEIGHT, ROUTER);
+        Bounds r7 = new Bounds(router7X, router7X + IMAGE_WIDTH, router7Y, router7Y + IMAGE_HEIGHT, ROUTER);
+        Bounds r8 = new Bounds(router8X, router8X + IMAGE_WIDTH, router8Y, router8Y + IMAGE_HEIGHT, ROUTER);
 
         //Add bounds in order of being visited.
         hostLayerBoundsRed = new Bounds[]{app1, pres1, sess1, trans1, net1, dat1, phy1};
@@ -489,9 +508,10 @@ public class GraphicPanel extends JPanel{
 
         //Add second destination bounds for blue bubble.
         hostLayerBoundsBlue = hostLayerBoundsRed;
+        destLayerBoundsBlue = destLayerBoundsRed;
 
         //Add router bounds to bounds array
-        routerBounds = new Bounds[]{r1, r2, r3};
+        routerBounds = new Bounds[]{r1, r2, r3, r4, r5, r6, r7, r8};
     }
 
     /**
@@ -636,25 +656,52 @@ public class GraphicPanel extends JPanel{
         double imageYACK = host1Y + IMAGE_HEIGHT/2 - BUBBLE_ACK_SIZE/2;
 
         //Nodes, Layer1 not including since it is the starting point for both bubbles
-        Node nodeH1 = new Node(host1X, imageY, HOST);
-        Node nodeH2 = new Node(host2X, imageY, HOST);
+        Node nodeH1 = new Node(host1X, imageY);
+        Node nodeH2 = new Node(host2X, imageY);
 
-        Node nodeR1 = new Node(router1X, imageY, ROUTER);
-        Node nodeR2 = new Node(router2X, imageY, ROUTER);
+        Node nodeR1 = new Node(router1X, imageY);
+        Node nodeR2 = new Node(router2X, imageY);
+        Node nodeR3 = new Node(router3X, imageY);
+        Node nodeR4 = new Node(router4X, imageY);
+        Node nodeR5 = new Node(router5X, imageY);
+        Node nodeR6 = new Node(router6X, imageY);
+        Node nodeR7 = new Node(router7X, imageY);
+        Node nodeR8 = new Node(router8X, imageY);
 
-        Node nodeL2 = new Node(host2X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer2Y, LAYER);
+        Node nodeL2 = new Node(host2X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer2Y);
 
-        Node nodeR1ACK = new Node(router1X, imageYACK, ROUTER);
+        Node nodeR1ACK = new Node(router1X, imageYACK);
 
         graph.addNode(nodeH1);
         graph.addNode(nodeH2);
         graph.addNode(nodeR1);
         graph.addNode(nodeR2);
+        graph.addNode(nodeR3);
+        graph.addNode(nodeR4);
+        graph.addNode(nodeR5);
+        graph.addNode(nodeR6);
+        graph.addNode(nodeR7);
+        graph.addNode(nodeR8);
         graph.addNode(nodeL2);
 
         //Secondary node for R1 for ACK -- size is different
         graph.addNode(nodeR1ACK);
+
+        Edge edge1 = new Edge(nodeR1, nodeR2);
+        Edge edge2 = new Edge(nodeR1, nodeR7);
+        Edge edge3 = new Edge(nodeR2, nodeR5);
+        Edge edge4 = new Edge(nodeR5, nodeR7);
+        Edge edge5 = new Edge(nodeR2, nodeR3);
+        Edge edge6 = new Edge(nodeR5, nodeR6);
+        Edge edge7 = new Edge(nodeR7, nodeR8);
+        Edge edge8 = new Edge(nodeR3, nodeR6);
+        Edge edge9 = new Edge(nodeR6, nodeR8);
+        Edge edge10 = new Edge(nodeR3, nodeR4);
+        Edge edge11 = new Edge(nodeR4, nodeR8);
+
     }
+
+
 
     /*
      * Stop animation.

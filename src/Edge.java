@@ -1,3 +1,5 @@
+import java.util.Random;
+
 /**
  * Created by ken12_000 on 1/29/2016.
  */
@@ -6,16 +8,16 @@ public class Edge {
     private int weight;
 
     //Start and end coordinates of the edges
-    private double start;
-    private double end;
+    private Node start;
+    private Node end;
 
-    public Edge(double x, double y, int w){
+    public Edge(Node x, Node y){
         start = x;
         end = y;
-        weight = w;
+        weight = getRandomWeight();
     }
 
-    public double getStart() {
+    public Node getStart() {
         return start;
     }
 
@@ -23,7 +25,18 @@ public class Edge {
         return weight;
     }
 
-    public double getEnd() {
+    public Node getEnd() {
         return end;
+    }
+
+    /**
+     * Get a random number between 1 and 7 (inclusive)
+     */
+    private int getRandomWeight(){
+        int min = 1;
+        int max = 7;
+
+        Random rm = new Random();
+        return rm.nextInt((max - min) + 1) + min;
     }
 }
