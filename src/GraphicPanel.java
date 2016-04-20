@@ -651,24 +651,33 @@ public class GraphicPanel extends JPanel{
      * Add the nodes to the graph
      */
     private void createNodes(){
+        //Types for nodes that NEED to be at specific place in path
+        String h1 = "HOST_1";
+        String h2 = "HOST_2";
+        String l2 = "LAYER_2";
+        String r1 = "ROUTER_1";
+        String r4 = "ROUTER_4";
+        String router = "ROUTER";
+
+
         //Y-coordinate that centers bubble on image for H1, H2, R1 and R2 (all on same horizontal line)
         double imageY = host1Y + IMAGE_HEIGHT/2 - BUBBLE_SIZE/2;
         double imageYACK = host1Y + IMAGE_HEIGHT/2 - BUBBLE_ACK_SIZE/2;
 
         //Nodes, Layer1 not including since it is the starting point for both bubbles
-        Node nodeH1 = new Node(host1X, imageY);
-        Node nodeH2 = new Node(host2X, imageY);
+        Node nodeH1 = new Node(host1X, imageY, h1);
+        Node nodeH2 = new Node(host2X, imageY, h2);
 
-        Node nodeR1 = new Node(router1X, imageY);
-        Node nodeR2 = new Node(router2X, imageY);
-        Node nodeR3 = new Node(router3X, imageY);
-        Node nodeR4 = new Node(router4X, imageY);
-        Node nodeR5 = new Node(router5X, imageY);
-        Node nodeR6 = new Node(router6X, imageY);
-        Node nodeR7 = new Node(router7X, imageY);
-        Node nodeR8 = new Node(router8X, imageY);
+        Node nodeR1 = new Node(router1X, imageY, r1);
+        Node nodeR2 = new Node(router2X, imageY, router);
+        Node nodeR3 = new Node(router3X, imageY, router);
+        Node nodeR4 = new Node(router4X, imageY, r4);
+        Node nodeR5 = new Node(router5X, imageY, router);
+        Node nodeR6 = new Node(router6X, imageY, router);
+        Node nodeR7 = new Node(router7X, imageY, router);
+        Node nodeR8 = new Node(router8X, imageY, router);
 
-        Node nodeL2 = new Node(host2X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer2Y);
+        Node nodeL2 = new Node(host2X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer2Y, l2);
 
         Node nodeR1ACK = new Node(router1X, imageYACK);
 
@@ -698,7 +707,6 @@ public class GraphicPanel extends JPanel{
         Edge edge9 = new Edge(nodeR6, nodeR8);
         Edge edge10 = new Edge(nodeR3, nodeR4);
         Edge edge11 = new Edge(nodeR4, nodeR8);
-
     }
 
 
