@@ -29,20 +29,16 @@ public class Graph {
         edgeList.add(e);
     }
 
-    public ArrayList<Node> getPath(){
-        return nodeList;
-    }
-
     /**
      * Pre-determined path for the red message bubble.
      */
-    public ArrayList<Node> getPathRed(){
-        ArrayList<Node> red = new ArrayList<>();
-        Node[] shortestPath;
-        ArrayList<Node> routers;
+    public ArrayList<Node> getPath(){
+        ArrayList<Node> path = new ArrayList<>();
+        ArrayList<Node> shortestPath;
+        ArrayList<Node> routers = new ArrayList<>();
 
-        Node sourceNode;
-        Node targetNode;
+        Node sourceNode = null;
+        Node targetNode = null;
 
         //Find the router1 node and make it source node
         for(Node node : nodeList){
@@ -67,42 +63,32 @@ public class Graph {
         }
 
         //Use Dijkstra's algorithm to find shortest path between source and target node
-        shortestPath = Dijkstra(ArrayList<Node> routers, sourceNode, targetNode);
+        shortestPath = Dijkstra(routers, sourceNode, targetNode);
 
         //Find the host 1 node and add it first
         for(Node node : nodeList){
             if(node.getType().equals(host1))
-                red.add(0, node);
+                path.add(0, node);
+        }
+
+        //Add the nodes of the shortest path to the path list
+        for(Node node : shortestPath){
+            path.add(node);
         }
 
         //Find the host 2 node and add it second-to-last
         for(Node node : nodeList){
             if(node.getType().equals(host2))
-                red.add(node);
+                path.add(node);
         }
 
         //Find the layer 2 node and add it last
         for(Node node : nodeList){
             if(node.getType().equals(layer2))
-                red.add(node);
+                path.add(node);
         }
 
-        return red;
-    }
-
-    /**
-     * Pre-determined path for the blue message bubble
-     */
-    public ArrayList<Node> getPathBlue(){
-        ArrayList<Node> blue = new ArrayList<>();
-
-        blue.add(nodeList.get(0));
-        blue.add(nodeList.get(3));
-        blue.add(nodeList.get(5));
-        blue.add(nodeList.get(2));
-        blue.add(nodeList.get(7));
-
-        return blue;
+        return path;
     }
 
     /**
@@ -111,7 +97,12 @@ public class Graph {
     public ArrayList<Node> getPathACK(){
         ArrayList<Node> ack = new ArrayList<>();
 
-        ack.add(nodeList.get(8));
+        //Find router1 and make it the path
+        for(Node node : nodeList){
+            if(node.getType().equals(router1)){
+                ack.add(node);
+            }
+        }
 
         return ack;
     }
@@ -119,10 +110,10 @@ public class Graph {
     /**
      * Return the shortest path betweent the source and target node
      */
-    private Node[] Dijkstra(ArrayList<Node> graph, Node source, Node target){
+    private ArrayList<Node> Dijkstra(ArrayList<Node> graph, Node source, Node target){
         ArrayList<Node> q = new ArrayList<>();
-        ArrayList<Integer> dist = new ArrayList<>();
-        ArrayList<Node> prev = new ArrayList<>();
+        ArrayList<Node> shortestPath = new ArrayList<>();
+        boolean targetFound = false;
 
         //For each node in the graph
         for(Node node : graph){
@@ -134,18 +125,102 @@ public class Graph {
         source.setDist(0);  //Distance from source to source
 
         Node u;
-        while(q.size() != 0){
+        while(q.size() != 0 && !targetFound){
             //Source node will be selected first
+            u = getMinimumDistanceNode(q);
 
+            //Once u = target node, then done
+            //Otherwise, look for shorter paths
+            if(u != target){
+                q.remove(u);
+
+                ArrayList<Node> neighbors = getNeighbors(u); //All neighbors of u
+                ArrayList<Node> validNeighbors = new ArrayList<>(); //neighbors still in q
+
+                //Find all neighbors still in q
+                for(Node neigh : neighbors){
+                    if(q.contains(neigh)){
+                        validNeighbors.add(neigh);
+                    }
+                }
+
+                //For each neighbor of u
+                for(Node neighbor : validNeighbors){
+                    int alt = u.getDist() + getEdge(u, neighbor).getWeight();
+
+                    if(alt < neighbor.getDist()){
+                        neighbor.setDist(alt);
+                        neighbor.setPrev(u);
+                    }
+                }
+            }
+            else{
+                targetFound = true;
+            }
         }
 
-        
+        //Traverse previous nodes from target and add them to shortest path
+        Node targ = target;
+        while(targ.getPrev() != null){
+            shortestPath.add(0, targ);
+            targ = targ.getPrev();
+        }
+        shortestPath.add(0, targ);
+
+        return shortestPath;
     }
 
     /**
-     * Get the distance between two nodes
+     * Get the node with the smallest distance.
      */
-    private int getDistance(Node node1, Node node2){
-        return 0;
+    private Node getMinimumDistanceNode(ArrayList<Node> list){
+        Node minNode = null;
+        int min = 10000;
+
+        //Get the node with the smallest distance
+        for(Node cur : list){
+            if(cur.getDist() < min){
+                minNode = cur;
+                min = cur.getDist();
+            }
+        }
+
+        return minNode;
+    }
+
+    /**
+     * Get the neighbors of the given node.
+     */
+    private ArrayList<Node> getNeighbors(Node node){
+        ArrayList<Node> neighbors = new ArrayList<>();
+
+            for(Edge edge : edgeList){
+                if(node == edge.getStart()){
+                    neighbors.add(edge.getEnd());
+                }
+                else if(node == edge.getEnd()){
+                    neighbors.add(edge.getStart());
+                }
+            }
+
+        return neighbors;
+    }
+
+    /**
+     * Return the edge that contains passed nodes
+     */
+    private Edge getEdge(Node node1, Node node2){
+        Edge edge = null;
+
+        for(Edge cur : edgeList){
+            if(cur.getStart() == node1 && cur.getEnd() == node2){
+                edge = cur;
+            }
+            else if(cur.getStart() == node2 && cur.getEnd() == node1){
+                edge = cur;
+            }
+        }
+
+        return edge;
     }
 }

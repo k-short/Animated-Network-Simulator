@@ -520,8 +520,8 @@ public class GraphicPanel extends JPanel{
    // @Override
     public void run() {
         //Get pre-determined paths for the red and blue message bubbles
-        ArrayList<Node> pathRed = graph.getPathRed();
-        ArrayList<Node> pathBlue = graph.getPathBlue();
+        ArrayList<Node> pathRed = graph.getPath();
+        ArrayList<Node> pathBlue = graph.getPath();
         ArrayList<Node> pathACK = graph.getPathACK();
 
         //Set the first target nodes for the message bubbles
@@ -658,6 +658,7 @@ public class GraphicPanel extends JPanel{
         String r1 = "ROUTER_1";
         String r4 = "ROUTER_4";
         String router = "ROUTER";
+        String ack = "ACK";
 
 
         //Y-coordinate that centers bubble on image for H1, H2, R1 and R2 (all on same horizontal line)
@@ -679,7 +680,7 @@ public class GraphicPanel extends JPanel{
 
         Node nodeL2 = new Node(host2X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer2Y, l2);
 
-        Node nodeR1ACK = new Node(router1X, imageYACK);
+        Node nodeR1ACK = new Node(router1X, imageYACK, ack);
 
         graph.addNode(nodeH1);
         graph.addNode(nodeH2);
@@ -713,7 +714,7 @@ public class GraphicPanel extends JPanel{
 
     /*
      * Stop animation.
-     * For reset button in NetworkGUI
+     * For reset button in NetworkGUI.
      */
     public void stop(){
         isRunning = false;

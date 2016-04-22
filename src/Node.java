@@ -13,11 +13,6 @@ public class Node {
     //Type for certain nodes
     private String type;
 
-    public Node(double x, double y){
-        xCoord = x;
-        yCoord = y;
-    }
-
     public Node(double x, double y, String t){
         xCoord = x;
         yCoord = y;
