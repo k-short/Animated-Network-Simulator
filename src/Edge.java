@@ -5,29 +5,68 @@ import java.util.Random;
  */
 public class Edge {
     //Weight of the edge
-    private int weight;
+    private int redWeight;
+    private int blueWeight;
 
     //Start and end coordinates of the edges
     private Node start;
     private Node end;
 
+    //Coordinates of the nodes
+    private int startX;
+    private int startY;
+
+    private int endX;
+    private int endY;
+
+
     public Edge(Node x, Node y){
         start = x;
         end = y;
-        weight = getRandomWeight();
+
+        redWeight = getRandomWeight();
+        blueWeight = getRandomWeight();
     }
 
     public Node getStart() {
         return start;
     }
 
-    public int getWeight() {
-        return weight;
+    public int getRedWeight() {
+        return redWeight;
+    }
+
+    public int getBlueWeight() {
+        return blueWeight;
     }
 
     public Node getEnd() {
         return end;
     }
+
+    /**
+     * Return x coordinate of the center of the edge
+     */
+    public int getCenterX(){
+        int length = Math.abs(endX - startX);
+
+        if(startX < endX)
+            return startX + (length/2);
+        else
+            return startX - (length/2);
+    }
+
+    /**
+     * Return the y coordinate of the center of the edge
+     */
+    public int getCenterY(){
+        if(startY < endY)
+            return startY + Math.abs(startY - endY)/2;
+        else
+            return startY - Math.abs(startY - endY)/2;
+    }
+
+
 
     /**
      * Get a random number between 1 and 7 (inclusive)
@@ -38,5 +77,15 @@ public class Edge {
 
         Random rm = new Random();
         return rm.nextInt((max - min) + 1) + min;
+    }
+
+    /**
+     * Set edge coordinates as appears on-screen
+     */
+    public void setCoordinates(int sX, int sY, int eX, int eY){
+        startX = sX;
+        startY = sY;
+        endX = eX;
+        endY = eY;
     }
 }

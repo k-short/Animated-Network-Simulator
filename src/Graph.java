@@ -14,6 +14,7 @@ public class Graph {
     private final String host2 = "HOST_2";
     private final String layer2 = "LAYER_2";
     private final String router1 = "ROUTER_1";
+    private final String router4 = "ROUTER_4";
     private final String router = "ROUTER";
 
     public Graph(){
@@ -31,8 +32,10 @@ public class Graph {
 
     /**
      * Pre-determined path for the red message bubble.
+     * Passed int:  0 == red bubble path
+     *              1 == blue bubble path
      */
-    public ArrayList<Node> getPath(){
+    public ArrayList<Node> getPath(int color){
         ArrayList<Node> path = new ArrayList<>();
         ArrayList<Node> shortestPath;
         ArrayList<Node> routers = new ArrayList<>();
@@ -42,7 +45,7 @@ public class Graph {
 
         //Find the router1 node and make it source node
         for(Node node : nodeList){
-            if(node.getType().equals(host2)){
+            if(node.getType().equals(router1)){
                 sourceNode = node;
                 routers.add(node);
             }
@@ -56,14 +59,17 @@ public class Graph {
 
         //Find the router4 node and make it the target node
         for(Node node : nodeList){
-            if(node.getType().equals(host2)) {
+            if(node.getType().equals(router4)) {
                 targetNode = node;
                 routers.add(node);
             }
         }
 
         //Use Dijkstra's algorithm to find shortest path between source and target node
-        shortestPath = Dijkstra(routers, sourceNode, targetNode);
+        if(color == 0) {
+            shortestPath = redDijkstra(routers, sourceNode, targetNode);
+        }else
+            shortestPath = blueDijkstra(routers, sourceNode, targetNode);
 
         //Find the host 1 node and add it first
         for(Node node : nodeList){
@@ -109,8 +115,9 @@ public class Graph {
 
     /**
      * Return the shortest path betweent the source and target node
+     * Uses red weights for edges
      */
-    private ArrayList<Node> Dijkstra(ArrayList<Node> graph, Node source, Node target){
+    private ArrayList<Node> redDijkstra(ArrayList<Node> graph, Node source, Node target){
         ArrayList<Node> q = new ArrayList<>();
         ArrayList<Node> shortestPath = new ArrayList<>();
         boolean targetFound = false;
@@ -146,7 +153,7 @@ public class Graph {
 
                 //For each neighbor of u
                 for(Node neighbor : validNeighbors){
-                    int alt = u.getDist() + getEdge(u, neighbor).getWeight();
+                    int alt = u.getDist() + getEdge(u, neighbor).getRedWeight();
 
                     if(alt < neighbor.getDist()){
                         neighbor.setDist(alt);
@@ -166,6 +173,88 @@ public class Graph {
             targ = targ.getPrev();
         }
         shortestPath.add(0, targ);
+
+        /*String str = "";
+        for(Node node : shortestPath){
+            str += node.getType();
+        }
+        System.out.println(str);*/
+
+        return shortestPath;
+    }
+
+    /**
+     * Return the shortest path betweent the source and target node
+     * Uses blue weights for edges
+     */
+    private ArrayList<Node> blueDijkstra(ArrayList<Node> graph, Node source, Node target){
+        ArrayList<Node> q = new ArrayList<>();
+        ArrayList<Node> shortestPath = new ArrayList<>();
+        boolean targetFound = false;
+
+        //For each node in the graph
+        for(Node node : graph){
+            node.setDist(1000);  //infinite distance from source
+            node.setPrev(null);  //prev node in optimal path
+            q.add(node);        //all nodes start out in q
+        }
+
+        source.setDist(0);  //Distance from source to source
+
+        String str1 = "";
+        for(Node node : graph){
+            str1 += node.getType();
+        }
+        System.out.println(str1);
+
+        Node u;
+        while(q.size() != 0 && !targetFound){
+            //Source node will be selected first
+            u = getMinimumDistanceNode(q);
+
+            //Once u = target node, then done
+            //Otherwise, look for shorter paths
+            if(u != target){
+                q.remove(u);
+
+                ArrayList<Node> neighbors = getNeighbors(u); //All neighbors of u
+                ArrayList<Node> validNeighbors = new ArrayList<>(); //neighbors still in q
+
+                //Find all neighbors still in q
+                for(Node neigh : neighbors){
+                    if(q.contains(neigh)){
+                        validNeighbors.add(neigh);
+                    }
+                }
+
+                //For each neighbor of u
+                for(Node neighbor : validNeighbors){
+                    int alt = u.getDist() + getEdge(u, neighbor).getBlueWeight();
+
+                    if(alt < neighbor.getDist()){
+                        neighbor.setDist(alt);
+                        neighbor.setPrev(u);
+                    }
+                }
+            }
+            else{
+                targetFound = true;
+            }
+        }
+
+        //Traverse previous nodes from target and add them to shortest path
+        Node targ = target;
+        while(targ.getPrev() != null){
+            shortestPath.add(0, targ);
+            targ = targ.getPrev();
+        }
+        shortestPath.add(0, targ);
+
+        /*String str = "";
+        for(Node node : shortestPath){
+            str += node.getType();
+        }
+        System.out.println(str);*/
 
         return shortestPath;
     }
@@ -222,5 +311,9 @@ public class Graph {
         }
 
         return edge;
+    }
+
+    public ArrayList<Edge> getEdgeList(){
+        return edgeList;
     }
 }

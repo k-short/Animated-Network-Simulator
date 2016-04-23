@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.util.ArrayList;
 
 /**
@@ -30,8 +31,6 @@ public class GraphicPanel extends JPanel{
 
     //Types of nodes
     private final String ROUTER = "ROUTER";
-    private final String HOST = "HOST";
-    private final String LAYER = "LAYER";
 
     //Message bubble
     private MessageBubble bubbleRed;
@@ -53,24 +52,6 @@ public class GraphicPanel extends JPanel{
 
     //Graph to hold nodes and edges
     private Graph graph;
-
-    //Desktop and router images
-    private BufferedImage hostImage1;
-    private BufferedImage hostImage2;
-    private BufferedImage routerImage1;
-    private BufferedImage routerImage2;
-    private BufferedImage routerImage3;
-    private BufferedImage routerImage4;
-    private BufferedImage routerImage5;
-    private BufferedImage routerImage6;
-    private BufferedImage routerImage7;
-    private BufferedImage routerImage8;
-
-
-
-    //7-layer images
-    private BufferedImage layersImage1;
-    private BufferedImage layersImage2;
 
     //Timer image for ACK
     private BufferedImage timerImage;
@@ -94,7 +75,6 @@ public class GraphicPanel extends JPanel{
     //Icon String labels
     private String host1Label = "H1";
     private String host2Label = "H2";
-    private String host3Label = "H3";
     private String router1Label = "R1";
     private String router2Label = "R2";
     private String router3Label = "R3";
@@ -308,19 +288,37 @@ public class GraphicPanel extends JPanel{
         g2.drawString(router7Label, router7LabelX, router7LabelY);
         g2.drawString(router8Label, router8LabelX, router8LabelY);
 
+        //Draw the red weights of the edges
+        g2.setColor(Color.red);
+        ArrayList<Edge> edges = graph.getEdgeList();
+        for (Edge edge : edges){
+            g2.drawString("" + edge.getRedWeight(), edge.getCenterX(),  edge.getCenterY());
+        }
+
+        //Draw slash marks
+        g2.setColor(Color.black);
+        for (Edge edge : edges){
+            g2.drawString(" / ", edge.getCenterX() + 10,  edge.getCenterY());
+        }
+
+        //Draw the blue weights of the edges
+        g2.setColor(Color.blue);
+        for (Edge edge : edges){
+            g2.drawString("" + edge.getBlueWeight(), edge.getCenterX() + 20,  edge.getCenterY());
+        }
 
         //Draw lines in between images
-        // i.e. H1 - R1 - R2 - H2
         BasicStroke bold = new BasicStroke(2.0f);
         g2.setStroke(bold);
+        g2.setColor(Color.black);
 
         g2.draw(new Line2D.Double(host1X+IMAGE_WIDTH, host1Y+(IMAGE_HEIGHT/2), router1X, router1Y+(IMAGE_HEIGHT/2)));
         g2.draw(new Line2D.Double(router1X+(IMAGE_WIDTH/2), router1Y, router2X + (IMAGE_WIDTH/2), router2Y+IMAGE_HEIGHT));
         g2.draw(new Line2D.Double(router2X + IMAGE_WIDTH, router2Y + (IMAGE_HEIGHT/2), router3X, router3Y + (IMAGE_HEIGHT/2)));
         g2.draw(new Line2D.Double(router1X + (IMAGE_WIDTH/2), router1Y + IMAGE_HEIGHT, router7X + (IMAGE_WIDTH/2), router7Y));
         g2.draw(new Line2D.Double(router7X + IMAGE_WIDTH, router7Y + (IMAGE_HEIGHT/2), router8X, router8Y + (IMAGE_HEIGHT/2)));
-        g2.draw(new Line2D.Double(router4X + (IMAGE_WIDTH/2), router1Y, router3X + (IMAGE_WIDTH/2), router3Y + IMAGE_HEIGHT));
-        g2.draw(new Line2D.Double(router4X + (IMAGE_WIDTH/2), router1Y + IMAGE_HEIGHT, router8X + (IMAGE_WIDTH/2), router8Y));
+        g2.draw(new Line2D.Double(router4X + (IMAGE_WIDTH/2), router4Y, router3X + (IMAGE_WIDTH/2), router3Y + IMAGE_HEIGHT));
+        g2.draw(new Line2D.Double(router4X + (IMAGE_WIDTH/2), router4Y + IMAGE_HEIGHT, router8X + (IMAGE_WIDTH/2), router8Y));
         g2.draw(new Line2D.Double(router5X + IMAGE_WIDTH, router5Y + (IMAGE_HEIGHT/2), router6X, router6Y + (IMAGE_HEIGHT/2)));
         g2.draw(new Line2D.Double(router2X + IMAGE_WIDTH, router2Y + IMAGE_HEIGHT, router5X + (IMAGE_WIDTH/2), router5Y));
         g2.draw(new Line2D.Double(router5X + (IMAGE_WIDTH/2), router5Y + IMAGE_HEIGHT, router7X + IMAGE_WIDTH, router7Y));
@@ -515,13 +513,165 @@ public class GraphicPanel extends JPanel{
     }
 
     /**
+     * Create nodes for all image objects.
+     * Add the nodes to the graph
+     */
+    private void createNodes(){
+        //Types for nodes that NEED to be at specific place in path
+        String h1 = "HOST_1";
+        String h2 = "HOST_2";
+        String l2 = "LAYER_2";
+        String r1 = "ROUTER_1";
+        String r4 = "ROUTER_4";
+        String router = "ROUTER";
+        String ack = "ACK";
+
+
+        //Y-coordinate that centers bubble on image for H1, H2, R1 and R2 (all on same horizontal line)
+        double offset = IMAGE_HEIGHT/2 - BUBBLE_SIZE/2;
+        double imageYACK = router1Y + IMAGE_HEIGHT/2 - BUBBLE_ACK_SIZE/2;
+
+        //Nodes, Layer1 not including since it is the starting point for both bubbles
+        Node nodeH1 = new Node(host1X, host1Y + offset, h1);
+        Node nodeH2 = new Node(host2X, host2Y + offset, h2);
+
+        Node nodeR1 = new Node(router1X, router1Y + offset, r1);
+        Node nodeR2 = new Node(router2X, router2Y + offset, router);
+        Node nodeR3 = new Node(router3X, router3Y + offset, router);
+        Node nodeR4 = new Node(router4X, router4Y + offset, r4);
+        Node nodeR5 = new Node(router5X, router5Y + offset, router);
+        Node nodeR6 = new Node(router6X, router6Y + offset, router);
+        Node nodeR7 = new Node(router7X, router7Y + offset, router);
+        Node nodeR8 = new Node(router8X, router8Y + offset, router);
+
+        Node nodeL2 = new Node(host2X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer2Y, l2);
+
+        Node nodeR1ACK = new Node(router1X, imageYACK, ack);
+
+        graph.addNode(nodeH1);
+        graph.addNode(nodeH2);
+        graph.addNode(nodeR1);
+        graph.addNode(nodeR2);
+        graph.addNode(nodeR3);
+        graph.addNode(nodeR4);
+        graph.addNode(nodeR5);
+        graph.addNode(nodeR6);
+        graph.addNode(nodeR7);
+        graph.addNode(nodeR8);
+        graph.addNode(nodeL2);
+
+        //Secondary node for R1 for ACK -- size is different
+        graph.addNode(nodeR1ACK);
+
+        Edge edge1 = new Edge(nodeR1, nodeR2);
+        Edge edge2 = new Edge(nodeR1, nodeR7);
+        Edge edge3 = new Edge(nodeR2, nodeR5);
+        Edge edge4 = new Edge(nodeR5, nodeR7);
+        Edge edge5 = new Edge(nodeR2, nodeR3);
+        Edge edge6 = new Edge(nodeR5, nodeR6);
+        Edge edge7 = new Edge(nodeR7, nodeR8);
+        Edge edge8 = new Edge(nodeR3, nodeR6);
+        Edge edge9 = new Edge(nodeR6, nodeR8);
+        Edge edge10 = new Edge(nodeR3, nodeR4);
+        Edge edge11 = new Edge(nodeR4, nodeR8);
+
+        graph.addEdge(edge1);
+        graph.addEdge(edge2);
+        graph.addEdge(edge3);
+        graph.addEdge(edge4);
+        graph.addEdge(edge5);
+        graph.addEdge(edge6);
+        graph.addEdge(edge7);
+        graph.addEdge(edge8);
+        graph.addEdge(edge9);
+        graph.addEdge(edge10);
+        graph.addEdge(edge11);
+
+        int yOffsetHoriztal = 10;
+        int xOffsetHoriztal = 25;
+        int angleOffset = 40;
+        int angleOffsetR = 15;
+
+        //set the coordinates for the edges
+        edge1.setCoordinates(router1X+(IMAGE_WIDTH/2) - angleOffset, router1Y, router2X + (IMAGE_WIDTH/2) - angleOffset, router2Y+IMAGE_HEIGHT);
+        edge5.setCoordinates(router2X + IMAGE_WIDTH - xOffsetHoriztal, router2Y + (IMAGE_HEIGHT/2) - yOffsetHoriztal, router3X, router3Y + (IMAGE_HEIGHT/2) - yOffsetHoriztal);
+        edge2.setCoordinates(router1X + (IMAGE_WIDTH/2) - angleOffset, router1Y + IMAGE_HEIGHT, router7X + (IMAGE_WIDTH/2) - angleOffset, router7Y);
+        edge7.setCoordinates(router7X + IMAGE_WIDTH - xOffsetHoriztal, router7Y + (IMAGE_HEIGHT/2) - yOffsetHoriztal, router8X, router8Y + (IMAGE_HEIGHT/2) - yOffsetHoriztal);
+        edge10.setCoordinates(router4X + (IMAGE_WIDTH/2) + angleOffsetR, router4Y, router3X + (IMAGE_WIDTH/2) + angleOffsetR, router3Y + IMAGE_HEIGHT);
+        edge11.setCoordinates(router4X + (IMAGE_WIDTH/2) + angleOffsetR, router4Y + IMAGE_HEIGHT, router8X + (IMAGE_WIDTH/2) + angleOffsetR, router8Y);
+        edge6.setCoordinates(router5X + IMAGE_WIDTH - xOffsetHoriztal, router5Y + (IMAGE_HEIGHT/2) - yOffsetHoriztal, router6X, router6Y + (IMAGE_HEIGHT/2) - yOffsetHoriztal);
+        edge3.setCoordinates(router2X + IMAGE_WIDTH + angleOffsetR, router2Y + IMAGE_HEIGHT, router5X + (IMAGE_WIDTH/2) + angleOffsetR, router5Y);
+        edge4.setCoordinates(router5X + (IMAGE_WIDTH/2) + angleOffsetR, router5Y + IMAGE_HEIGHT, router7X + IMAGE_WIDTH + angleOffsetR, router7Y);
+        edge8.setCoordinates(router3X - angleOffset, router3Y + IMAGE_HEIGHT, router6X + IMAGE_WIDTH - angleOffset, router6Y);
+        edge9.setCoordinates(router6X + (IMAGE_WIDTH/2) - angleOffset, router6Y + IMAGE_HEIGHT, router8X - angleOffset, router8Y+ (IMAGE_HEIGHT/4));
+    }
+
+    /*
+     * Stop animation.
+     * For reset button in NetworkGUI.
+     */
+    public void stop(){
+        isRunning = false;
+        timerReady = false;
+        resend = false;
+        makeCopy = false;
+        discarded = false;
+        ackDone = false;
+        isPaused = false;
+
+        counter = 0;
+
+        bubbleRed.reset(bubbleX, bubbleY);
+        bubbleBlue.reset();
+        bubbleACK.resetACK(bubbleACKX, bubbleACKY);
+    }
+
+    public void setPaused(boolean paused) {
+        isPaused = paused;
+    }
+
+    /**
+     * Load all images to be used.
+     */
+    private void loadImages(){
+        //Load host and router images, layer images
+        try {
+            BufferedImage layersImage = ImageIO.read(getClass().getResource("/resources/images/7_layer_network.png"));
+
+            BufferedImage hostImage = ImageIO.read(getClass().getResource("/resources/images/desktop_icon.png"));
+
+            BufferedImage routerImage = ImageIO.read(getClass().getResource("/resources/images/router_icon.png"));
+
+            scaledL1 = layersImage.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
+            scaledL2 = layersImage.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
+
+            scaledH1 = hostImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledH2 = hostImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+
+            scaledR1 = routerImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR2 = routerImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR3 = routerImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR4 = routerImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR5 = routerImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR6 = routerImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR7 = routerImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+            scaledR8 = routerImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
+
+            timerImage = ImageIO.read(getClass().getResource("/resources/images/timer_icon.png"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Move the ball.
      */
-   // @Override
+    // @Override
     public void run() {
         //Get pre-determined paths for the red and blue message bubbles
-        ArrayList<Node> pathRed = graph.getPath();
-        ArrayList<Node> pathBlue = graph.getPath();
+        ArrayList<Node> pathRed = graph.getPath(0);
+        ArrayList<Node> pathBlue = graph.getPath(1);
         ArrayList<Node> pathACK = graph.getPathACK();
 
         //Set the first target nodes for the message bubbles
@@ -549,6 +699,13 @@ public class GraphicPanel extends JPanel{
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                redACKMove();
+            }
+
+            /**
+             * Method for handling ball movement if red bubble uses ACK router
+             */
+            private void redACKMove(){
                 //If red or bubble still moving then don't stop timer
                 if(isRunning && (redMoving || blueMoving) && !isPaused) {
                     //Move the red bubble
@@ -642,140 +799,9 @@ public class GraphicPanel extends JPanel{
                 }
             }
         };
-            timer.addActionListener(listener);
-            timer.start();
-    }
-
-    /**
-     * Create nodes for all image objects.
-     * Add the nodes to the graph
-     */
-    private void createNodes(){
-        //Types for nodes that NEED to be at specific place in path
-        String h1 = "HOST_1";
-        String h2 = "HOST_2";
-        String l2 = "LAYER_2";
-        String r1 = "ROUTER_1";
-        String r4 = "ROUTER_4";
-        String router = "ROUTER";
-        String ack = "ACK";
-
-
-        //Y-coordinate that centers bubble on image for H1, H2, R1 and R2 (all on same horizontal line)
-        double imageY = host1Y + IMAGE_HEIGHT/2 - BUBBLE_SIZE/2;
-        double imageYACK = host1Y + IMAGE_HEIGHT/2 - BUBBLE_ACK_SIZE/2;
-
-        //Nodes, Layer1 not including since it is the starting point for both bubbles
-        Node nodeH1 = new Node(host1X, imageY, h1);
-        Node nodeH2 = new Node(host2X, imageY, h2);
-
-        Node nodeR1 = new Node(router1X, imageY, r1);
-        Node nodeR2 = new Node(router2X, imageY, router);
-        Node nodeR3 = new Node(router3X, imageY, router);
-        Node nodeR4 = new Node(router4X, imageY, r4);
-        Node nodeR5 = new Node(router5X, imageY, router);
-        Node nodeR6 = new Node(router6X, imageY, router);
-        Node nodeR7 = new Node(router7X, imageY, router);
-        Node nodeR8 = new Node(router8X, imageY, router);
-
-        Node nodeL2 = new Node(host2X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer2Y, l2);
-
-        Node nodeR1ACK = new Node(router1X, imageYACK, ack);
-
-        graph.addNode(nodeH1);
-        graph.addNode(nodeH2);
-        graph.addNode(nodeR1);
-        graph.addNode(nodeR2);
-        graph.addNode(nodeR3);
-        graph.addNode(nodeR4);
-        graph.addNode(nodeR5);
-        graph.addNode(nodeR6);
-        graph.addNode(nodeR7);
-        graph.addNode(nodeR8);
-        graph.addNode(nodeL2);
-
-        //Secondary node for R1 for ACK -- size is different
-        graph.addNode(nodeR1ACK);
-
-        Edge edge1 = new Edge(nodeR1, nodeR2);
-        Edge edge2 = new Edge(nodeR1, nodeR7);
-        Edge edge3 = new Edge(nodeR2, nodeR5);
-        Edge edge4 = new Edge(nodeR5, nodeR7);
-        Edge edge5 = new Edge(nodeR2, nodeR3);
-        Edge edge6 = new Edge(nodeR5, nodeR6);
-        Edge edge7 = new Edge(nodeR7, nodeR8);
-        Edge edge8 = new Edge(nodeR3, nodeR6);
-        Edge edge9 = new Edge(nodeR6, nodeR8);
-        Edge edge10 = new Edge(nodeR3, nodeR4);
-        Edge edge11 = new Edge(nodeR4, nodeR8);
+        timer.addActionListener(listener);
+        timer.start();
     }
 
 
-
-    /*
-     * Stop animation.
-     * For reset button in NetworkGUI.
-     */
-    public void stop(){
-        isRunning = false;
-        timerReady = false;
-        resend = false;
-        makeCopy = false;
-        discarded = false;
-        ackDone = false;
-        isPaused = false;
-
-        counter = 0;
-
-        bubbleRed.reset(bubbleX, bubbleY);
-        bubbleBlue.reset();
-        bubbleACK.resetACK(bubbleACKX, bubbleACKY);
-    }
-
-    public void setPaused(boolean paused) {
-        isPaused = paused;
-    }
-
-    /**
-     * Load all images to be used.
-     */
-    private void loadImages(){
-        //Load host and router images, layer images
-        try {
-            layersImage1 = ImageIO.read(getClass().getResource("/resources/images/7_layer_network_1.png"));
-            layersImage2 = ImageIO.read(getClass().getResource("/resources/images/7_layer_network_2.png"));
-
-            hostImage1 = ImageIO.read(getClass().getResource("/resources/images/desktop_1_icon.png"));
-            hostImage2 = ImageIO.read(getClass().getResource("/resources/images/desktop_2_icon.png"));
-
-            routerImage1 = ImageIO.read(getClass().getResource("/resources/images/router_1_icon.png"));
-            routerImage2 = ImageIO.read(getClass().getResource("/resources/images/router_2_icon.png"));
-            routerImage3 = ImageIO.read(getClass().getResource("/resources/images/router_3_icon.png"));
-            routerImage4 = ImageIO.read(getClass().getResource("/resources/images/router_4_icon.png"));
-            routerImage5 = ImageIO.read(getClass().getResource("/resources/images/router_5_icon.png"));
-            routerImage6 = ImageIO.read(getClass().getResource("/resources/images/router_6_icon.png"));
-            routerImage7 = ImageIO.read(getClass().getResource("/resources/images/router_7_icon.png"));
-            routerImage8 = ImageIO.read(getClass().getResource("/resources/images/router_8_icon.png"));
-
-            scaledL1 = layersImage1.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
-            scaledL2 = layersImage2.getScaledInstance(LAYER_WIDTH, LAYER_HEIGHT, Image.SCALE_SMOOTH);
-
-            scaledH1 = hostImage1.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-            scaledH2 = hostImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-
-            scaledR1 = routerImage1.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-            scaledR2 = routerImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-            scaledR3 = routerImage1.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-            scaledR4 = routerImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-            scaledR5 = routerImage1.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-            scaledR6 = routerImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-            scaledR7 = routerImage1.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-            scaledR8 = routerImage2.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
-
-            timerImage = ImageIO.read(getClass().getResource("/resources/images/timer_icon.png"));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
