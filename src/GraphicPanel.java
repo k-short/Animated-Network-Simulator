@@ -626,13 +626,16 @@ public class GraphicPanel extends JPanel{
         //Multiply edge weight by this number to get timer delay
         final int SPEED_ADJUSTMENT = 10;
 
+        //Starting and ending speed for both bubbles
+        final int DEFAULT_SPEED = 40;
+
         //Listener for moving the red bubble
         ActionListener redListener = new ActionListener() {
             //Current place in path
             int redPos = 0;
 
             //Speed for bubble
-            int redSpeed = 40;
+            int redSpeed = DEFAULT_SPEED;
 
             //Booleans to keep track of if red and blue bubbles are done moving
             boolean redMoving = true;
@@ -642,7 +645,6 @@ public class GraphicPanel extends JPanel{
                 //If red or bubble still moving then don't stop timer
                 if(isRunning && redMoving && !isPaused) {
                     //Move the red bubble
-                    if(redMoving) { //Not at next target yet
                         if (bubbleRed.move()) {
                             repaint();
                         }
@@ -651,9 +653,13 @@ public class GraphicPanel extends JPanel{
                                 redPos++;
 
                                 //Adjust the speed of the bubble
-                                if(redPos > 1 && redPos < pathRed.size() - 2) {
+                               if(redPos > 1 && redPos < pathRed.size() - 2) {
                                     redSpeed = redWeights.get(redPos - 2);
                                     redTimer.setDelay(redSpeed*SPEED_ADJUSTMENT);
+                                }
+                                else if(redPos == pathRed.size() -2){ //set speed back to starting speed
+                                    redSpeed = DEFAULT_SPEED;
+                                    redTimer.setDelay(redSpeed);
                                 }
 
                                 bubbleRed.setTarget(pathRed.get(redPos));
@@ -662,7 +668,6 @@ public class GraphicPanel extends JPanel{
                                 redMoving = false;
                             }
                         }
-                    }
                 }else if(!isPaused){
                     redTimer.stop();
                 }
@@ -675,7 +680,7 @@ public class GraphicPanel extends JPanel{
             int bluePos = 0;
 
             //Speed for bubble
-            int blueSpeed = 40;
+            int blueSpeed = DEFAULT_SPEED;
 
             //Booleans to keep track of if red and blue bubbles are done moving
             boolean blueMoving = true;
@@ -693,9 +698,13 @@ public class GraphicPanel extends JPanel{
                             bluePos++;
 
                             //Adjust the speed of the bubble
-                            if(bluePos > 1 && bluePos < pathBlue.size() - 2) {
+                           if(bluePos > 1 && bluePos < pathBlue.size() - 2) {
                                 blueSpeed = blueWeights.get(bluePos - 2);
                                 blueTimer.setDelay(blueSpeed*SPEED_ADJUSTMENT);
+                            }
+                            else if(bluePos == pathBlue.size() -2){ //set speed back to starting speed
+                                blueSpeed = DEFAULT_SPEED;
+                                blueTimer.setDelay(blueSpeed);
                             }
 
                             bubbleBlue.setTarget(pathBlue.get(bluePos));
