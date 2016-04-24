@@ -69,6 +69,9 @@ public class MessageBubble extends Ellipse2D{
     //String to hold data in Bubble
     private String data = "INIT";
 
+    //Speed for bubble to animate to next target -- weight of the edge
+    private int targetSpeed;
+
     //Bounds for the host and dest layers
     Bounds[] hostLayerBounds;
     Bounds[] destLayerBounds;

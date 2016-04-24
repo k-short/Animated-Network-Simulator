@@ -15,19 +15,12 @@ import java.util.ArrayList;
  * Created by ken12_000 on 1/26/2016.
  */
 public class GraphicPanel extends JPanel{
-
+    //Graphics object
     Graphics2D g2;
 
-    private int speed =40;
-
-    boolean timerReady = false;
+    //For controlling animation
     boolean resend = false;
-    boolean makeCopy = false;
-    boolean discarded = false;
-    boolean ackDone = false;
     boolean isPaused = false;
-
-    int counter = 0;
 
     //Types of nodes
     private final String ROUTER = "ROUTER";
@@ -35,26 +28,16 @@ public class GraphicPanel extends JPanel{
     //Message bubble
     private MessageBubble bubbleRed;
     private MessageBubble bubbleBlue;
-    private MessageBubble bubbleRedCopy;
 
     //Message bubble starting coordinates
     private double bubbleX;
     private double bubbleY;
 
-    //Message bubble to act as ACK and its starting coordinates at R2
-    private MessageBubble bubbleACK;
-    private double bubbleACKX;
-    private double bubbleACKY;
-
     //Message bubble size
     private final int BUBBLE_SIZE = 40;
-    private final int BUBBLE_ACK_SIZE = 15;
 
     //Graph to hold nodes and edges
     private Graph graph;
-
-    //Timer image for ACK
-    private BufferedImage timerImage;
 
     //Scaled images
     private Image scaledH1;
@@ -205,13 +188,6 @@ public class GraphicPanel extends JPanel{
         bubbleBlue = bBlue;
         bubbleBlue.setAttributes(bubbleX, bubbleY - BUBBLE_SIZE - 10, BUBBLE_SIZE, BUBBLE_SIZE, Color.blue);
 
-        //Create ACK bubble
-        bubbleACK = new MessageBubble(bubbleACKX, bubbleACKY, BUBBLE_ACK_SIZE, BUBBLE_ACK_SIZE, Color.green);
-        bubbleACK.setBubbleType("ACK");
-
-        //Create copy of red bubble for R1
-        bubbleRedCopy = new MessageBubble(router1X, router1Y, BUBBLE_SIZE, BUBBLE_SIZE, Color.red);
-
         //Assign bounds to bubble
         bubbleRed.setHostLayerBounds(hostLayerBoundsRed);
         bubbleRed.setDestLayerBounds(destLayerBoundsRed);
@@ -240,19 +216,9 @@ public class GraphicPanel extends JPanel{
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
-        //Add message bubble
-        if(makeCopy){
-            bubbleRedCopy.draw(g2);
-        }
-        if(!discarded) {
-            bubbleRed.draw(g2);
-        }
 
+        bubbleRed.draw(g2);
         bubbleBlue.draw(g2);
-
-        if(!ackDone) {
-            bubbleACK.draw(g2);
-        }
 
         //Add desktop and router icons
         g2.drawImage(scaledH1,host1X, host1Y, null);
@@ -270,10 +236,6 @@ public class GraphicPanel extends JPanel{
         //Add 7 layer images
         g2.drawImage(scaledL1, layer1X, layer1Y, null);
         g2.drawImage(scaledL2, layer2X, layer2Y, null);
-
-        if(timerReady) {
-            g2.drawImage(timerImage, timerX, timerY, null);
-        }
 
         //Add String labels to desktop and router icons
         g2.setColor(Color.black);
@@ -385,14 +347,6 @@ public class GraphicPanel extends JPanel{
         //Set bubble starting coordinates
         bubbleX = layer1X + (LAYER_WIDTH / 2) - (BUBBLE_SIZE/2);
         bubbleY = layer1Y;
-
-        //Set ACK bubble coordinates starting at R2
-        bubbleACKX = router2X;
-        bubbleACKY = router2Y + IMAGE_HEIGHT/2;
-
-        //Set timer coordinates below R1
-        timerX = router1X + IMAGE_WIDTH;
-        timerY = router2Y + IMAGE_HEIGHT;
     }
 
     /**
@@ -524,12 +478,9 @@ public class GraphicPanel extends JPanel{
         String r1 = "ROUTER_1";
         String r4 = "ROUTER_4";
         String router = "ROUTER";
-        String ack = "ACK";
-
 
         //Y-coordinate that centers bubble on image for H1, H2, R1 and R2 (all on same horizontal line)
         double offset = IMAGE_HEIGHT/2 - BUBBLE_SIZE/2;
-        double imageYACK = router1Y + IMAGE_HEIGHT/2 - BUBBLE_ACK_SIZE/2;
 
         //Nodes, Layer1 not including since it is the starting point for both bubbles
         Node nodeH1 = new Node(host1X, host1Y + offset, h1);
@@ -546,8 +497,6 @@ public class GraphicPanel extends JPanel{
 
         Node nodeL2 = new Node(host2X + IMAGE_WIDTH/2 - BUBBLE_SIZE/2, layer2Y, l2);
 
-        Node nodeR1ACK = new Node(router1X, imageYACK, ack);
-
         graph.addNode(nodeH1);
         graph.addNode(nodeH2);
         graph.addNode(nodeR1);
@@ -559,9 +508,6 @@ public class GraphicPanel extends JPanel{
         graph.addNode(nodeR7);
         graph.addNode(nodeR8);
         graph.addNode(nodeL2);
-
-        //Secondary node for R1 for ACK -- size is different
-        graph.addNode(nodeR1ACK);
 
         Edge edge1 = new Edge(nodeR1, nodeR2);
         Edge edge2 = new Edge(nodeR1, nodeR7);
@@ -612,18 +558,10 @@ public class GraphicPanel extends JPanel{
      */
     public void stop(){
         isRunning = false;
-        timerReady = false;
-        resend = false;
-        makeCopy = false;
-        discarded = false;
-        ackDone = false;
         isPaused = false;
-
-        counter = 0;
 
         bubbleRed.reset(bubbleX, bubbleY);
         bubbleBlue.reset();
-        bubbleACK.resetACK(bubbleACKX, bubbleACKY);
     }
 
     public void setPaused(boolean paused) {
@@ -657,8 +595,6 @@ public class GraphicPanel extends JPanel{
             scaledR7 = routerImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
             scaledR8 = routerImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
 
-            timerImage = ImageIO.read(getClass().getResource("/resources/images/timer_icon.png"));
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -672,74 +608,52 @@ public class GraphicPanel extends JPanel{
         //Get pre-determined paths for the red and blue message bubbles
         ArrayList<Node> pathRed = graph.getPath(0);
         ArrayList<Node> pathBlue = graph.getPath(1);
-        ArrayList<Node> pathACK = graph.getPathACK();
+
+        ArrayList<Integer> redWeights = graph.getWeights(0);
+        ArrayList<Integer> blueWeights = graph.getWeights(1);
 
         //Set the first target nodes for the message bubbles
         bubbleRed.setTarget(pathRed.get(0));
         bubbleBlue.setTarget(pathBlue.get(0));
-        bubbleACK.setTarget(pathACK.get(0));
 
         //Create a timer for animation
-        Timer timer = new Timer(speed, null);
+        Timer redTimer = new Timer(40, null);
+        Timer blueTimer = new Timer(40, null);
 
         //Animation is currently running
         isRunning = true;
 
-        ActionListener listener = new ActionListener() {
+        //Multiply edge weight by this number to get timer delay
+        final int SPEED_ADJUSTMENT = 10;
+
+        //Listener for moving the red bubble
+        ActionListener redListener = new ActionListener() {
             //Current place in path
             int redPos = 0;
-            int bluePos = 0;
+
+            //Speed for bubble
+            int redSpeed = 40;
 
             //Booleans to keep track of if red and blue bubbles are done moving
             boolean redMoving = true;
-            boolean blueMoving = true;
-            boolean ackMoving = false;
-            //To know when ack has finished moving
-            boolean waitRed = false;
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                redACKMove();
-            }
-
-            /**
-             * Method for handling ball movement if red bubble uses ACK router
-             */
-            private void redACKMove(){
                 //If red or bubble still moving then don't stop timer
-                if(isRunning && (redMoving || blueMoving) && !isPaused) {
+                if(isRunning && redMoving && !isPaused) {
                     //Move the red bubble
-                    if(redMoving && !waitRed) { //Not at next target yet
+                    if(redMoving) { //Not at next target yet
                         if (bubbleRed.move()) {
                             repaint();
                         }
                         else { //At target, update next target in path
-                            if (redPos < pathRed.size() - 1 && !resend) {
+                            if (redPos < pathRed.size() - 1) {
                                 redPos++;
 
-                                //At R1, make a copy to leave there
-                                if(redPos == 2 && !ackDone){
-                                    makeCopy = true;
-                                    timerReady = true;
-                                    repaint();
-                                }
-
-                                //At R2 need to wait
-                                if(redPos == 3 && !ackDone){
-                                    //redMoving = false;
-                                    waitRed = true;
-                                    //repaint();
-                                }
-
-                                bubbleRed.setTarget(pathRed.get(redPos));
-                            }
-                            else if(redPos < pathRed.size() - 1){
-                                redPos++;
-
-                                //At R2, now ACK needs to be sent
-                                if(redPos == 3 && !ackDone){
-                                    ackMoving = true;
-                                    waitRed = false;
+                                //Adjust the speed of the bubble
+                                if(redPos > 1 && redPos < pathRed.size() - 2) {
+                                    redSpeed = redWeights.get(redPos - 2);
+                                    redTimer.setDelay(redSpeed*SPEED_ADJUSTMENT);
                                 }
 
                                 bubbleRed.setTarget(pathRed.get(redPos));
@@ -749,39 +663,27 @@ public class GraphicPanel extends JPanel{
                             }
                         }
                     }
+                }else if(!isPaused){
+                    redTimer.stop();
+                }
+            }
+        };
 
-                    //Move the ack bubble if second time red bubble has been sent
-                    if(ackMoving && resend){
-                        if(bubbleACK.move()){
-                            repaint();
-                        }
-                        else{ //ACK finished, let red continue moving
-                            ackMoving = false;
-                            ackDone = true;
-                            redMoving = true;
-                            timerReady = false;
-                            repaint();
-                        }
-                    }else if(counter >=100 && !resend){
-                        discarded = true;
-                        JTextPane pane = bubbleRed.getBubblePane();
-                        SineWavePanel panel = bubbleRed.getSinePanel();
-                        bubbleRed = bubbleRedCopy;
-                        bubbleRed.setHostLayerBounds(hostLayerBoundsRed);
-                        bubbleRed.setDestLayerBounds(destLayerBoundsRed);
-                        bubbleRed.setCurrentBounds(destLayerBoundsRed);
-                        bubbleRed.setRouterBounds(routerBounds);
-                        bubbleRed.setBubblePane(pane);
-                        bubbleRed.setSineWavePanel(panel);
-                        redPos = 1;
-                        bubbleRedCopy.setTarget(pathRed.get(2));
-                        waitRed = false;
-                        counter = 0;
-                        resend = true;
-                    }
-                    else if(waitRed && counter < 100){
-                        counter ++;
-                    }
+        //Listener for moving the blue bubble
+        ActionListener blueListener = new ActionListener() {
+            //Current place in path
+            int bluePos = 0;
+
+            //Speed for bubble
+            int blueSpeed = 40;
+
+            //Booleans to keep track of if red and blue bubbles are done moving
+            boolean blueMoving = true;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //If red or bubble still moving then don't stop timer
+                if(isRunning &&  blueMoving && !isPaused) {
 
                     //Move the blue bubble
                     if (bubbleBlue.move()) {
@@ -789,18 +691,29 @@ public class GraphicPanel extends JPanel{
                     } else {
                         if (bluePos < pathBlue.size() - 1) {
                             bluePos++;
+
+                            //Adjust the speed of the bubble
+                            if(bluePos > 1 && bluePos < pathBlue.size() - 2) {
+                                blueSpeed = blueWeights.get(bluePos - 2);
+                                blueTimer.setDelay(blueSpeed*SPEED_ADJUSTMENT);
+                            }
+
                             bubbleBlue.setTarget(pathBlue.get(bluePos));
                         } else {
                             blueMoving = false;
                         }
                     }
                 }else if(!isPaused){
-                    timer.stop();
+                    blueTimer.stop();
                 }
             }
         };
-        timer.addActionListener(listener);
-        timer.start();
+
+        redTimer.addActionListener(redListener);
+        blueTimer.addActionListener(blueListener);
+
+        redTimer.start();
+        blueTimer.start();
     }
 
 

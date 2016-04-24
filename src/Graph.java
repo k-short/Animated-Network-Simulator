@@ -1,4 +1,5 @@
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationHandler;
 import java.util.ArrayList;
 
 /**
@@ -8,6 +9,8 @@ public class Graph {
     //Lists
     private ArrayList<Node> nodeList;
     private ArrayList<Edge> edgeList;
+    private ArrayList<Integer> redWeights;
+    private ArrayList<Integer> blueWeights;
 
     //Types for certain nodes
     private final String host1 = "HOST_1";
@@ -20,6 +23,8 @@ public class Graph {
     public Graph(){
         nodeList = new ArrayList<>();
         edgeList = new ArrayList<>();
+        redWeights = new ArrayList<>();
+        blueWeights = new ArrayList<>();
     }
 
     public void addNode(Node n){
@@ -68,8 +73,9 @@ public class Graph {
         //Use Dijkstra's algorithm to find shortest path between source and target node
         if(color == 0) {
             shortestPath = redDijkstra(routers, sourceNode, targetNode);
-        }else
+        }else {
             shortestPath = blueDijkstra(routers, sourceNode, targetNode);
+        }
 
         //Find the host 1 node and add it first
         for(Node node : nodeList){
@@ -93,6 +99,15 @@ public class Graph {
             if(node.getType().equals(layer2))
                 path.add(node);
         }
+
+        //Set weights for all edges in the path (BETWEEN ROUTERS ONLY -- others don't have weights)
+        //i.e. all nodes in path except indices:  0, n, n-1 (n == last node)
+        ArrayList<Node> routerEdges = new ArrayList<>();
+        for(int i = 1; i < path.size() - 2; i ++){
+            routerEdges.add(path.get(i));
+        }
+
+        setWeights(routerEdges, color);
 
         return path;
     }
@@ -174,12 +189,6 @@ public class Graph {
         }
         shortestPath.add(0, targ);
 
-        /*String str = "";
-        for(Node node : shortestPath){
-            str += node.getType();
-        }
-        System.out.println(str);*/
-
         return shortestPath;
     }
 
@@ -200,12 +209,6 @@ public class Graph {
         }
 
         source.setDist(0);  //Distance from source to source
-
-        String str1 = "";
-        for(Node node : graph){
-            str1 += node.getType();
-        }
-        System.out.println(str1);
 
         Node u;
         while(q.size() != 0 && !targetFound){
@@ -249,12 +252,6 @@ public class Graph {
             targ = targ.getPrev();
         }
         shortestPath.add(0, targ);
-
-        /*String str = "";
-        for(Node node : shortestPath){
-            str += node.getType();
-        }
-        System.out.println(str);*/
 
         return shortestPath;
     }
@@ -315,5 +312,37 @@ public class Graph {
 
     public ArrayList<Edge> getEdgeList(){
         return edgeList;
+    }
+
+    /**
+     * Get the weights of the shortest path, in order of the path's edges from source to target.
+     * Shortest path must of been created before-hand.
+     * Passed parameters:  0 == red weights, 1 == blue weights
+     */
+    public ArrayList<Integer> getWeights(int color){
+        if(color == 0){
+            return redWeights;
+        }
+        else
+            return blueWeights;
+    }
+
+    /**
+     * Set the weights for the edges of the given path.
+     * If color == 0, then weights are for the red path, if color == 1 then for blue path
+     */
+    private void setWeights(ArrayList<Node> path, int color){
+        if(color == 0){
+            //Get current node and next in path, then find the edge between the two nodes and get the weight
+            for(int i = 0; i < path.size() - 1; i++){
+               redWeights.add(getEdge(path.get(i), path.get(i + 1)).getRedWeight());
+            }
+
+        }else{
+            //Get current node and next in path, then find the edge between the two nodes and get the weight
+            for(int i = 0; i < path.size() - 1; i++){
+                blueWeights.add(getEdge(path.get(i), path.get(i + 1)).getBlueWeight());
+            }
+        }
     }
 }
