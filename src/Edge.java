@@ -88,4 +88,12 @@ public class Edge {
         endX = eX;
         endY = eY;
     }
+
+    /**
+     * Reset the weights of the edge
+     */
+    public void resetWeights(){
+        redWeight = getRandomWeight();
+        blueWeight = getRandomWeight();
+    }
 }

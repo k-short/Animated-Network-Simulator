@@ -345,4 +345,16 @@ public class Graph {
             }
         }
     }
+
+    /**
+     * Reset the weights of each edge in the graph.
+     */
+    public void resetWeights(){
+        for(Edge edge : edgeList){
+            edge.resetWeights();
+        }
+
+        redWeights.clear();
+        blueWeights.clear();
+    }
 }

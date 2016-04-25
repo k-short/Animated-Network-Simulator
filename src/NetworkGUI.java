@@ -236,6 +236,7 @@ public class NetworkGUI {
             paused = false;
             pauseButton.setText("Pause");
             graphicPanel.stop();
+            graphicPanel.resetWeights();
             graphicPanel.repaint();
         }
     }

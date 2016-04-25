@@ -182,11 +182,11 @@ public class GraphicPanel extends JPanel{
 
         //Create red message bubble
         bubbleRed = bRed;
-        bubbleRed.setAttributes(bubbleX, bubbleY, BUBBLE_SIZE, BUBBLE_SIZE, Color.red);
+        bubbleRed.setAttributes(bubbleX + 10, bubbleY, BUBBLE_SIZE, BUBBLE_SIZE, Color.red);
 
         //Create blue message bubble
         bubbleBlue = bBlue;
-        bubbleBlue.setAttributes(bubbleX, bubbleY - BUBBLE_SIZE - 10, BUBBLE_SIZE, BUBBLE_SIZE, Color.blue);
+        bubbleBlue.setAttributes(bubbleX - 10, bubbleY, BUBBLE_SIZE, BUBBLE_SIZE, Color.blue);
 
         //Assign bounds to bubble
         bubbleRed.setHostLayerBounds(hostLayerBoundsRed);
@@ -601,6 +601,13 @@ public class GraphicPanel extends JPanel{
     }
 
     /**
+     * Reset the weights of the graph.
+     */
+    public void resetWeights(){
+        graph.resetWeights();
+    }
+
+    /**
      * Move the ball.
      */
     // @Override
@@ -609,8 +616,20 @@ public class GraphicPanel extends JPanel{
         ArrayList<Node> pathRed = graph.getPath(0);
         ArrayList<Node> pathBlue = graph.getPath(1);
 
+        String str1 = "";
+        for(Node n : pathRed){
+            str1 += " " + n.getType();
+        }
+        System.out.println(str1);
+
         ArrayList<Integer> redWeights = graph.getWeights(0);
         ArrayList<Integer> blueWeights = graph.getWeights(1);
+
+        String str = "";
+        for(Integer i : redWeights){
+            str += " " + i;
+        }
+        System.out.println(str);
 
         //Set the first target nodes for the message bubbles
         bubbleRed.setTarget(pathRed.get(0));
@@ -724,6 +743,4 @@ public class GraphicPanel extends JPanel{
         redTimer.start();
         blueTimer.start();
     }
-
-
 }
