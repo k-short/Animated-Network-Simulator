@@ -615,21 +615,9 @@ public class GraphicPanel extends JPanel{
         //Get pre-determined paths for the red and blue message bubbles
         ArrayList<Node> pathRed = graph.getPath(0);
         ArrayList<Node> pathBlue = graph.getPath(1);
-
-        String str1 = "";
-        for(Node n : pathRed){
-            str1 += " " + n.getType();
-        }
-        System.out.println(str1);
-
+        
         ArrayList<Integer> redWeights = graph.getWeights(0);
         ArrayList<Integer> blueWeights = graph.getWeights(1);
-
-        String str = "";
-        for(Integer i : redWeights){
-            str += " " + i;
-        }
-        System.out.println(str);
 
         //Set the first target nodes for the message bubbles
         bubbleRed.setTarget(pathRed.get(0));
